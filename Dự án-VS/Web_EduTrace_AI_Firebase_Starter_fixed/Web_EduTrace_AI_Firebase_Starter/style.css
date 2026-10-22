@@ -190,7 +190,9 @@ img {
   position: sticky;
   top: 0;
   z-index: 1000;
-  height: var(--header-h);
+  min-height: var(--header-h); /* Giữ chiều cao tối thiểu đẹp mắt */
+  height: auto;               /* Tự động giãn khi có phần tử rớt dòng */
+  padding: 8px 0;             /* Thêm khoảng đệm trên dưới để không bị sát viền */
   background: rgba(10, 25, 47, 0.96);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
@@ -199,11 +201,14 @@ img {
 }
 
 .nav-container {
-  height: 100%;
+  min-height: calc(var(--header-h) - 16px);
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-wrap: wrap; /* Cho phép các khối xếp gọn khi màn hình hẹp */
+  gap: 12px;
 }
+
 
 .nav-brand {
   display: flex;
