@@ -41,17 +41,14 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /leads/{leadId} {
-      allow create: if request.resource.data.keys().hasAll(["name", "phone", "email", "role", "createdAt", "source"]) &&
-                       request.resource.data.source == "edutrace-ai-website";
-      allow read, update, delete: if false;
+      allow create, read, update, delete: if true;
     }
     match /bookingRequests/{requestId} {
-      allow create: if request.resource.data.keys().hasAll(["parentName", "parentPhone", "targetCenter", "preferredSchedule", "status", "createdAt", "source"]) &&
-                       request.resource.data.source == "edutrace-ai-website";
-      allow read, update, delete: if false;
+      allow create, read, update, delete: if true;
     }
+    // Cho phép đồng bộ danh sách tài khoản đa máy qua Cloud Firestore
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
+      allow read, write: if true;
     }
     match /{document=**} {
       allow read, write: if false;

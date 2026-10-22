@@ -156,6 +156,14 @@
             <p>Theo dõi, chỉnh sửa phân quyền và quản lý tài khoản người dùng trên nền tảng EduTrace AI</p>
           </div>
           <div class="admin-header-btns">
+            <button type="button" class="btn btn-outline-light btn-sync-cloud" id="btnSyncFirestore" title="Kéo dữ liệu người dùng mới nhất từ Cloud Firestore (Đồng bộ đa máy)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sync-icon">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              <span>Đồng Bộ Cloud</span>
+            </button>
             <button type="button" class="btn btn-outline-light" id="btnExportUsersCSV" style="color: #0f172a; border-color: #cbd5e1; background: #ffffff;">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
@@ -293,6 +301,16 @@
           <div class="admin-page-title">
             <h1>Yêu Cầu Tư Vấn &amp; Lịch Hẹn Can Thiệp 1-1</h1>
             <p>Quản lý các lượt chuyển đổi từ phễu trao giá trị trước (Value-First) đến trung tâm can thiệp</p>
+          </div>
+          <div class="admin-header-btns">
+            <button type="button" class="btn btn-outline-light btn-sync-cloud" id="btnSyncBookingsFirestore" title="Kéo đơn tư vấn và đặt lịch mới nhất từ Cloud Firestore (Đồng bộ đa máy)">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="sync-icon">
+                <polyline points="23 4 23 10 17 10"></polyline>
+                <polyline points="1 20 1 14 7 14"></polyline>
+                <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+              </svg>
+              <span>Đồng Bộ Lịch Hẹn</span>
+            </button>
           </div>
         </div>
 

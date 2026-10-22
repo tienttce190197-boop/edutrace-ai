@@ -802,12 +802,19 @@ export async function toggleUserStatusByAdmin(uid) {
 
 // Fetch all users from Firestore Database and sync to local cache
 export async function syncUsersWithFirestore() {
-  if (!db) return getAllUsersList();
+  if (!db) {
+    return { success: false, reason: "no-db", users: getAllUsersList(), cloudCount: 0 };
+  }
   try {
     const snap = await getDocs(collection(db, "users"));
-    if (snap.empty) return getAllUsersList();
-
     const localList = getAllUsersList();
+    if (snap.empty) {
+      return { success: true, users: localList, cloudCount: 0, newAdded: 0 };
+    }
+
+    let newAddedCount = 0;
+    let updatedCount = 0;
+
     snap.forEach((docSnap) => {
       const data = docSnap.data();
       let createdStr = "Mới tạo";
@@ -828,19 +835,36 @@ export async function syncUsersWithFirestore() {
         createdAt: createdStr
       };
 
-      const idx = localList.findIndex((u) => u.uid === cloudEntry.uid || (u.email && u.email.toLowerCase() === cloudEntry.email.toLowerCase()));
+      const idx = localList.findIndex(
+        (u) => u.uid === cloudEntry.uid || (u.email && cloudEntry.email && u.email.toLowerCase() === cloudEntry.email.toLowerCase())
+      );
       if (idx !== -1) {
         localList[idx] = { ...localList[idx], ...cloudEntry };
+        updatedCount++;
       } else {
-        localList.push(cloudEntry);
+        // Đưa tài khoản mới đăng ký từ máy khác lên đầu danh sách để Admin thấy ngay
+        localList.unshift(cloudEntry);
+        newAddedCount++;
       }
     });
 
     localStorage.setItem(LOCAL_STORAGE_USERS_LIST_KEY, JSON.stringify(localList));
-    return localList;
+    return {
+      success: true,
+      users: localList,
+      cloudCount: snap.size,
+      newAdded: newAddedCount,
+      updated: updatedCount
+    };
   } catch (err) {
-    console.info("Đồng bộ Firestore users skipped hoặc bị hạn chế bởi Rules:", err.code || err.message);
-    return getAllUsersList();
+    console.warn("Đồng bộ Firestore users skipped hoặc bị hạn chế bởi Rules:", err.code || err.message);
+    return {
+      success: false,
+      error: err,
+      users: getAllUsersList(),
+      cloudCount: 0,
+      newAdded: 0
+    };
   }
 }
 
@@ -859,7 +883,7 @@ export async function syncActivitiesWithFirestore() {
         if (d.createdAt?.toDate) {
           createdStr = d.createdAt.toDate().toLocaleString("vi-VN");
         }
-        list.push({
+        list.unshift({
           id: docSnap.id,
           type: "consultation",
           userEmail: d.email || "",
@@ -884,7 +908,7 @@ export async function syncActivitiesWithFirestore() {
         if (d.createdAt?.toDate) {
           createdStr = d.createdAt.toDate().toLocaleString("vi-VN");
         }
-        list.push({
+        list.unshift({
           id: docSnap.id,
           type: "booking",
           userEmail: d.email || "",

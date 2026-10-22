@@ -70,6 +70,8 @@ function setupAdminApp() {
   const userStatusFilter = document.getElementById("userStatusFilter");
   const btnOpenAddUserModal = document.getElementById("btnOpenAddUserModal");
   const btnExportUsersCSV = document.getElementById("btnExportUsersCSV");
+  const btnSyncFirestore = document.getElementById("btnSyncFirestore");
+  const btnSyncBookingsFirestore = document.getElementById("btnSyncBookingsFirestore");
 
   // Modal User Form Elements
   const modalBackdrop = document.getElementById("modalUserFormBackdrop");
@@ -475,6 +477,59 @@ function setupAdminApp() {
     link.click();
     document.body.removeChild(link);
     showToast("Đã tải danh sách người dùng về máy (File CSV)!");
+  });
+
+  // 5.1 SYNC CLOUD FIRESTORE USERS (ĐỒNG BỘ ĐA MÁY)
+  btnSyncFirestore?.addEventListener("click", async () => {
+    btnSyncFirestore.disabled = true;
+    btnSyncFirestore.classList.add("spinning");
+    showToast("Đang đồng bộ người dùng từ Cloud Firestore...");
+
+    try {
+      const res = await syncUsersWithFirestore();
+      renderUsersTable();
+
+      if (res && res.success) {
+        if (res.cloudCount > 0) {
+          showToast(`Đồng bộ thành công! Tìm thấy ${res.cloudCount} tài khoản trên Cloud (${res.newAdded || 0} mới).`);
+        } else {
+          showToast("Đồng bộ hoàn tất. Chưa có thêm tài khoản mới nào trên Cloud Firestore.");
+        }
+      } else if (res && res.error) {
+        if (res.error.code === "permission-denied") {
+          showToast("Quyền Firestore bị chặn! Hãy cập nhật file firestore.rules trên Firebase Console.");
+        } else {
+          showToast(`Chưa thể đồng bộ: ${res.error.message || "Lỗi kết nối Firebase"}`);
+        }
+      } else {
+        showToast("Đã đồng bộ xong danh sách người dùng từ Cloud.");
+      }
+    } catch (err) {
+      console.error("Lỗi đồng bộ users:", err);
+      showToast("Lỗi khi kết nối Cloud Firestore. Vui lòng kiểm tra Rules trên Console.");
+    } finally {
+      btnSyncFirestore.disabled = false;
+      btnSyncFirestore.classList.remove("spinning");
+    }
+  });
+
+  // 5.2 SYNC CLOUD FIRESTORE BOOKINGS & LEADS
+  btnSyncBookingsFirestore?.addEventListener("click", async () => {
+    btnSyncBookingsFirestore.disabled = true;
+    btnSyncBookingsFirestore.classList.add("spinning");
+    showToast("Đang đồng bộ yêu cầu tư vấn & lịch hẹn từ Cloud...");
+
+    try {
+      await syncActivitiesWithFirestore();
+      renderBookingsTable();
+      showToast("Đồng bộ lịch hẹn và yêu cầu tư vấn từ Cloud thành công!");
+    } catch (err) {
+      console.error("Lỗi đồng bộ activities:", err);
+      showToast("Lỗi khi đồng bộ lịch hẹn từ Cloud Firestore.");
+    } finally {
+      btnSyncBookingsFirestore.disabled = false;
+      btnSyncBookingsFirestore.classList.remove("spinning");
+    }
   });
 
   // 6. RENDER BOOKINGS & LEADS TABLE
