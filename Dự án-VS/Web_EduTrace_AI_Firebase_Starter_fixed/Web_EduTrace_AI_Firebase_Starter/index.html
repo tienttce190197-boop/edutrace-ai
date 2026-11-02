@@ -243,7 +243,13 @@
         <p id="parentReferralStatus" role="status">Đang tải danh sách bác sĩ...</p>
         <form id="parentReferralForm">
           <label>Vấn đề quan tâm <select name="topic" class="form-control" required><option value="">Chọn vấn đề</option><option>Giao tiếp và ngôn ngữ</option><option>Tương tác xã hội</option><option>Chú ý và hành vi</option><option>Vấn đề khác</option></select></label>
-          <label>Hình thức <select name="mode" class="form-control"><option value="note">Gửi ghi chú</option><option value="milestones">Làm bảng mốc CDC 2 tuổi</option></select></label>
+          <label>Hình thức <select name="mode" class="form-control"><option value="note">Gửi ghi chú</option><option value="milestones">Làm bảng mốc CDC 2 tuổi</option><option value="mchat_external">Chia sẻ kết quả M-CHAT-R/F từ tài liệu gốc</option><option value="vanderbilt_external">Chia sẻ kết quả Vanderbilt từ tài liệu gốc</option></select></label>
+          <div id="externalAssessment" hidden>
+            <p id="externalAssessmentDescription"></p>
+            <a id="externalAssessmentSource" href="https://www.mchatscreen.com/mchat-rf/translations/" target="_blank" rel="noopener noreferrer">Mở tài liệu gốc</a>
+            <p>Hoàn thành biểu mẫu từ nguồn gốc cùng chuyên gia khi cần, rồi nhập thông tin bạn muốn chia sẻ vào ô ghi chú. Ứng dụng không tự chấm điểm hay diễn giải biểu mẫu này.</p>
+            <label>Tuổi của trẻ (tháng) <input name="externalAgeMonths" type="number" class="form-control"></label>
+          </div>
           <div id="milestoneQuestions" hidden>
             <p>Chỉ dùng bảng này cho trẻ từ 24 đến dưới 30 tháng. Nếu trẻ sinh non hơn 3 tuần, hãy hỏi bác sĩ về tuổi hiệu chỉnh.</p>
             <label>Tuổi của trẻ (tháng) <input name="ageMonths" type="number" min="24" max="29" class="form-control"></label>
@@ -1125,6 +1131,7 @@
 
             <section class="ai-analysis-card" aria-labelledby="screeningSourcesTitle" style="margin-top: 16px;">
               <h4 id="screeningSourcesTitle">Tài liệu sàng lọc và theo dõi từ nguồn chính thức</h4>
+              <div id="screeningSuggestion" role="status" aria-live="polite"></div>
               <p>Công cụ cần phù hợp với độ tuổi và được bác sĩ hướng dẫn. Sàng lọc không phải chẩn đoán; các liên kết mở tài liệu bên ngoài và không tự gửi kết quả cho bác sĩ.</p>
               <ul style="padding-left: 20px; line-height: 1.8;">
                 <li><a href="https://www.mchatscreen.com/mchat-rf/translations/" target="_blank" rel="noopener noreferrer">M-CHAT-R/F: bản dịch tiếng Việt của tác giả</a> — sàng lọc tự kỷ cho trẻ 16–30 tháng.</li>
@@ -2622,6 +2629,7 @@
   <script src="js/gemini-service.js"></script>
   <script src="script.js"></script>
   <script src="js/gemini-chatbot-ui.js"></script>
+  <script type="module" src="js/screening-suggestions-ui.js"></script>
   <!-- Firebase integration: remains in demo mode until js/firebase-config.js is configured. -->
   <script type="module" src="js/firebase-integration.js"></script>
   <!-- Floating Back to Top Button -->

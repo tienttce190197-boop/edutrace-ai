@@ -799,14 +799,14 @@ function initAIAssistant() {
           setTimeout(() => {
             const ruleResult = analyzeWithDoctorRules(customText);
             renderDynamicAIResult(ruleResult);
-            showToast('Trợ lý AI (Phác đồ Bác sĩ Cần Thơ & M-CHAT) đã phân tích xong bài tập phù hợp!');
+            showToast('Đã hiển thị gợi ý tự động từ dữ liệu có sẵn; hãy trao đổi thêm với bác sĩ.');
           }, 600);
         }
       } catch (err) {
         console.warn('Gemini API call failed, falling back to Doctor rules:', err);
         const ruleResult = analyzeWithDoctorRules(customText);
         renderDynamicAIResult(ruleResult);
-        showToast('Đã đối soát xong qua Phác đồ Bác sĩ Cần Thơ & M-CHAT-R/F!');
+        showToast('Gemini không phản hồi; đang hiển thị gợi ý từ dữ liệu có sẵn.');
       } finally {
         setTimeout(() => {
           analyzeBtn.disabled = false;

@@ -10,6 +10,14 @@ const items = document.getElementById('milestoneItems');
 const aiResult = document.getElementById('milestoneAiResult');
 const aiText = document.getElementById('milestoneAiText');
 const aiButton = document.getElementById('milestoneAiReview');
+const externalAssessment = document.getElementById('externalAssessment');
+const externalDescription = document.getElementById('externalAssessmentDescription');
+const externalSource = document.getElementById('externalAssessmentSource');
+const externalAge = form.elements.externalAgeMonths;
+const externalModes = {
+  mchat_external: { title:'M-CHAT-R/F', source:'https://www.mchatscreen.com/mchat-rf/translations/', min:16, max:30, description:'M-CHAT-R/F dành cho trẻ 16–30 tháng. Chọn bản tiếng Việt trên trang tác giả; bài có bước theo dõi khi cần.' },
+  vanderbilt_external: { title:'NICHQ Vanderbilt, bản phụ huynh', source:'https://nichq.org/wp-content/uploads/2024/09/NICHQ-Vanderbilt-Assessment-Scales.pdf', min:72, max:155, description:'Tài liệu gốc bản tiếng Anh, bản phụ huynh bắt đầu ở trang 2. Thang hỗ trợ chuyên gia đánh giá trẻ 6–12 tuổi; thường cần thông tin từ phụ huynh và giáo viên.' }
+};
 let reviewVersion = 0;
 function clearReview() { reviewVersion++; aiResult.hidden = true; aiText.textContent = ''; }
 for (const [i, text] of milestones.entries()) {
@@ -21,9 +29,18 @@ for (const [i, text] of milestones.entries()) {
 }
 function toggleMode() {
   const enabled = form.elements.mode.value === 'milestones';
+  const external = externalModes[form.elements.mode.value];
   questions.hidden = !enabled;
+  externalAssessment.hidden = !external;
+  externalAge.disabled = !external;
+  externalAge.required = Boolean(external);
+  if (external) { externalAge.min = external.min; externalAge.max = external.max; externalDescription.textContent = external.description; externalSource.href = external.source; }
+  form.elements.ageMonths.disabled = !enabled;
   form.elements.ageMonths.required = enabled;
-  for (let i = 0; i < milestones.length; i++) form.elements[`milestone${i}`].required = enabled;
+  for (let i = 0; i < milestones.length; i++) {
+    form.elements[`milestone${i}`].disabled = !enabled;
+    form.elements[`milestone${i}`].required = enabled;
+  }
   form.elements.content.required = !enabled;
 }
 form.elements.mode.addEventListener('change', toggleMode);
@@ -68,9 +85,10 @@ form.addEventListener('submit', async event => {
   const current = epoch, button = form.querySelector('[type=submit]'); button.disabled = true;
   try {
     const note = form.elements.content.value.trim();
+    const external = externalModes[form.elements.mode.value];
     const content = form.elements.mode.value === 'milestones'
       ? `Tuổi do phụ huynh nhập: ${form.elements.ageMonths.value} tháng\n${formatChecklist(milestones.map((_, i) => form.elements[`milestone${i}`].value), note)}`
-      : note;
+      : external ? `Phụ huynh chia sẻ thông tin từ: ${external.title}\nNguồn: ${external.source}\nTuổi do phụ huynh nhập: ${externalAge.value} tháng\nNội dung do phụ huynh tự nhập (chưa được hệ thống xác minh hay chấm điểm):\n${note}` : note;
     if (!content) { status.textContent = 'Vui lòng nhập nội dung.'; return; }
     await addDoc(collection(db,'screeningSubmissions'), {parentUid:uid,clinicianUid:select.value,topic:form.elements.topic.value,content,consent:form.elements.consent.checked,status:'new',createdAt:serverTimestamp()});
     if (current === epoch) { form.reset(); toggleMode(); clearReview(); status.textContent = 'Đã gửi thông tin cho bác sĩ. Bác sĩ sẽ thấy khi mở ứng dụng.'; }
