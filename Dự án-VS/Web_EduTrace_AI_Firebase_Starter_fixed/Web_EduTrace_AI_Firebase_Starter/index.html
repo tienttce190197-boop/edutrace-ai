@@ -232,6 +232,37 @@
         </div>
         <button type="button" class="role-workspace-profile" id="roleWorkspaceProfile">Thông tin tài khoản <span aria-hidden="true">↗</span></button>
       </div>
+      <div class="role-workspace-cards" id="parentWorkspace" hidden>
+        <a class="role-workspace-card" href="#ai-assistant-demo"><span class="role-card-icon">✦</span><strong>Trợ lý AI</strong><span>Trao đổi về những điều bạn quan tâm trong quá trình phát triển của trẻ.</span><span class="role-card-link">Mở trợ lý →</span></a>
+        <a class="role-workspace-card" href="#exercise-hub"><span class="role-card-icon">✚</span><strong>Bài tập tại nhà</strong><span>Khám phá tài nguyên và bài tập hỗ trợ.</span><span class="role-card-link">Xem bài tập →</span></a>
+        <a class="role-workspace-card" href="#contact"><span class="role-card-icon">✉</span><strong>Liên hệ tư vấn</strong><span>Gửi yêu cầu để được đội ngũ EduTrace hỗ trợ.</span><span class="role-card-link">Gửi yêu cầu →</span></a>
+      </div>
+      <section id="parentReferralPanel" class="clinical-panel" hidden aria-labelledby="parentReferralTitle">
+        <h3 id="parentReferralTitle">Theo dõi phát triển và gửi bác sĩ</h3>
+        <p>Bảng theo dõi 2 tuổi phỏng theo CDC, không thay thế sàng lọc hoặc chẩn đoán. Nếu trẻ mất kỹ năng hoặc bạn lo ngại, hãy trao đổi với bác sĩ, không chờ làm bảng. Hãy hạn chế thông tin định danh.</p>
+        <p id="parentReferralStatus" role="status">Đang tải danh sách bác sĩ...</p>
+        <form id="parentReferralForm">
+          <label>Vấn đề quan tâm <select name="topic" class="form-control" required><option value="">Chọn vấn đề</option><option>Giao tiếp và ngôn ngữ</option><option>Tương tác xã hội</option><option>Chú ý và hành vi</option><option>Vấn đề khác</option></select></label>
+          <label>Hình thức <select name="mode" class="form-control"><option value="note">Gửi ghi chú</option><option value="milestones">Làm bảng mốc CDC 2 tuổi</option></select></label>
+          <div id="milestoneQuestions" hidden>
+            <p>Chỉ dùng bảng này cho trẻ từ 24 đến dưới 30 tháng. Nếu trẻ sinh non hơn 3 tuần, hãy hỏi bác sĩ về tuổi hiệu chỉnh.</p>
+            <label>Tuổi của trẻ (tháng) <input name="ageMonths" type="number" min="24" max="29" class="form-control"></label>
+            <div id="milestoneItems"></div>
+            <p>Khi yêu cầu nhận xét, tuổi và câu trả lời sẽ được gửi đến dịch vụ Gemini. Không gửi ghi chú hoặc tên trẻ trong bước này.</p>
+            <label><input type="checkbox" name="aiConsent"> Tôi đồng ý gửi tuổi và câu trả lời tới Gemini để nhận nhận xét.</label>
+            <button type="button" id="milestoneAiReview" class="role-workspace-profile">Nhận nhận xét từ AI</button>
+            <section id="milestoneAiResult" hidden aria-live="polite">
+              <p><strong>Đây là đánh giá từ AI dựa theo tài liệu nên chưa phải là đánh giá chính xác cuối cùng.</strong> AI có thể mắc sai sót; hãy hỏi bác sĩ, không dùng kết quả để chẩn đoán.</p>
+              <p id="milestoneAiText" style="white-space: pre-wrap"></p>
+              <p>Hãy chọn bác sĩ bên dưới và đồng ý chia sẻ để gửi câu trả lời cho bác sĩ tư vấn.</p>
+            </section>
+          </div>
+          <label>Ghi chú muốn chia sẻ <textarea name="content" class="form-control" maxlength="3000"></textarea></label>
+          <label>Bác sĩ nhận <select name="clinicianUid" class="form-control" required><option value="">Chọn bác sĩ</option></select></label>
+          <label><input type="checkbox" name="consent" required> Tôi đồng ý gửi nội dung trên cho bác sĩ đã chọn.</label>
+          <button type="submit" class="role-workspace-profile">Gửi cho bác sĩ</button>
+        </form>
+      </section>
       <div class="role-workspace-cards" id="doctorWorkspace" hidden>
         <a class="role-workspace-card" href="#clinicalPanel"><span class="role-card-icon">✚</span><strong>Quản lý ca can thiệp</strong><span>Đánh giá, kế hoạch bài tập và tiến độ theo từng mã ca.</span><span class="role-card-link">Mở danh sách ca →</span></a>
         <a class="role-workspace-card" href="#exercise-hub"><span class="role-card-icon">✚</span><strong>Kho bài tập can thiệp</strong><span>Xem các bài tập và video hướng dẫn hiện có.</span><span class="role-card-link">Xem bài tập →</span></a>
@@ -239,6 +270,7 @@
         <a class="role-workspace-card" href="#contact"><span class="role-card-icon">✉</span><strong>Liên hệ hợp tác</strong><span>Gửi thông tin để kết nối với đội ngũ EduTrace.</span><span class="role-card-link">Gửi yêu cầu →</span></a>
       </div>
       <section id="clinicalPanel" hidden aria-labelledby="clinicalTitle" class="clinical-panel">
+        <section aria-labelledby="screeningInboxTitle"><h3 id="screeningInboxTitle">Kết quả phụ huynh gửi</h3><p id="screeningInboxStatus" role="status">Đang kiểm tra quyền...</p><div id="screeningInbox" aria-live="polite"></div></section>
         <h3 id="clinicalTitle">Quản lý ca can thiệp</h3>
         <p id="clinicalMessage" role="status">Đang kiểm tra quyền truy cập...</p>
         <div id="clinicalContent" hidden>
@@ -1091,6 +1123,17 @@
               </div>
             </div>
 
+            <section class="ai-analysis-card" aria-labelledby="screeningSourcesTitle" style="margin-top: 16px;">
+              <h4 id="screeningSourcesTitle">Tài liệu sàng lọc và theo dõi từ nguồn chính thức</h4>
+              <p>Công cụ cần phù hợp với độ tuổi và được bác sĩ hướng dẫn. Sàng lọc không phải chẩn đoán; các liên kết mở tài liệu bên ngoài và không tự gửi kết quả cho bác sĩ.</p>
+              <ul style="padding-left: 20px; line-height: 1.8;">
+                <li><a href="https://www.mchatscreen.com/mchat-rf/translations/" target="_blank" rel="noopener noreferrer">M-CHAT-R/F: bản dịch tiếng Việt của tác giả</a> — sàng lọc tự kỷ cho trẻ 16–30 tháng.</li>
+                <li><a href="https://www.cdc.gov/act-early/resources/milestone-checklists.html" target="_blank" rel="noopener noreferrer">CDC: bảng theo dõi mốc phát triển tiếng Việt</a> — không thay thế sàng lọc chuyên môn.</li>
+                <li><a href="https://nichq.org/downloadable/nichq-vanderbilt-assessment-scales/" target="_blank" rel="noopener noreferrer">NICHQ Vanderbilt: biểu mẫu dành cho chuyên gia</a> — hỗ trợ đánh giá ADHD ở trẻ 6–12 tuổi.</li>
+              </ul>
+              <p>Trao đổi với bác sĩ về cách sử dụng và kết quả.</p>
+              <a href="#parentReferralPanel">Phụ huynh đăng nhập: làm bảng theo dõi 2 tuổi và gửi bác sĩ →</a>
+            </section>
             <!-- Recommended Exercise List -->
             <div>
               <div class="recom-section-title">

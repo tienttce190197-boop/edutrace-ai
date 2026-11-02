@@ -22,6 +22,7 @@ import {
 } from "./firebase-auth.js";
 import { escapeHtml } from "./escape-html.js";
 import { updateRoleWorkspace } from "./role-workspace.js";
+import { pageForRole } from "./role-routing.js";
 
 function setAvatar(element, photoURL, displayName, initial) {
   if (!element) return;
@@ -436,6 +437,10 @@ export function setupAuthUI() {
 
   // Subscribe to Auth State Changes
   subscribeAuth((user) => {
+    if (user && pageForRole(user.role) !== 'index.html') {
+      window.location.replace(pageForRole(user.role));
+      return;
+    }
     updateNavbarAuthState(user);
     updateRoleWorkspace(user);
     populateFormsWithUserData(user);

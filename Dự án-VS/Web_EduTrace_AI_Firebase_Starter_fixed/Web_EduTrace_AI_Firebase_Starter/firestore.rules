@@ -130,6 +130,35 @@ service cloud.firestore {
         && request.resource.data.source == 'edutrace-ai-website' && request.resource.data.createdAt == request.time;
       allow read, update, delete: if isAdmin();
     }
+    // Danh sách chỉ chứa thông tin bác sĩ đã được quản trị viên xác minh.
+    match /clinicianDirectory/{clinicianUid} {
+      allow read: if request.auth != null && (resource.data.active == true || isAdmin());
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasAll(['name', 'active'])
+        && request.resource.data.keys().hasOnly(['name', 'active'])
+        && request.resource.data.name is string && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 120
+        && request.resource.data.active is bool;
+      allow delete: if isAdmin();
+    }
+    // Nội dung gửi chỉ phụ huynh gửi và bác sĩ nhận được đọc.
+    match /screeningSubmissions/{submissionId} {
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasAll(['parentUid', 'clinicianUid', 'topic', 'content', 'consent', 'status', 'createdAt'])
+        && request.resource.data.keys().hasOnly(['parentUid', 'clinicianUid', 'topic', 'content', 'consent', 'status', 'createdAt'])
+        && request.resource.data.parentUid == request.auth.uid
+        && request.resource.data.clinicianUid is string && request.resource.data.clinicianUid.matches('^[A-Za-z0-9_-]{1,128}$')
+        && get(/databases/$(database)/documents/clinicianDirectory/$(request.resource.data.clinicianUid)).data.active == true
+        && request.resource.data.topic is string && request.resource.data.topic.size() > 0 && request.resource.data.topic.size() <= 120
+        && request.resource.data.content is string && request.resource.data.content.size() > 0 && request.resource.data.content.size() <= 5000
+        && request.resource.data.consent == true && request.resource.data.status == 'new' && request.resource.data.createdAt == request.time;
+      allow read: if request.auth != null && (resource.data.parentUid == request.auth.uid
+        || (resource.data.clinicianUid == request.auth.uid && request.auth.token.get('clinician', false) == true));
+      allow update: if request.auth != null && resource.data.clinicianUid == request.auth.uid
+        && request.auth.token.get('clinician', false) == true
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && resource.data.status == 'new' && request.resource.data.status == 'read';
+      allow delete: if false;
+    }
     match /centerDirectory/{centerUid} {
       allow read: if resource.data.active == true || isAdmin();
       allow create, update: if isAdmin() && request.resource.data.keys().hasAll(['name', 'active'])

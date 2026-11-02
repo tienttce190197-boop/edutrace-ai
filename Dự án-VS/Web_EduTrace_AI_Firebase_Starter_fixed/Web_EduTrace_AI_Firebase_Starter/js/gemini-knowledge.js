@@ -24,7 +24,7 @@ const EDUTRACE_KNOWLEDGE_BASE = {
       name: 'Thang sàng lọc M-CHAT-R/F (Modified Checklist for Autism in Toddlers - Revised with Follow-Up)',
       ageRange: '16 đến 30 tháng tuổi',
       scoringRules: {
-        lowRisk: '0 – 2 điểm: Nguy cơ thấp. Trẻ phát triển trong giới hạn độ tuổi. Tiếp tục theo dõi các mốc Denver II ở 24 và 36 tháng.',
+        lowRisk: '0 – 2 điểm: Nguy cơ thấp trên thang này; không loại trừ vấn đề phát triển khác. Trao đổi với bác sĩ nếu vẫn còn lo ngại.',
         mediumRisk: '3 – 7 điểm: Nguy cơ trung bình. Cần áp dụng phỏng vấn theo dõi (Follow-up), kết hợp rèn luyện bài tập tại nhà 3–5 phút mỗi ngày và đặt lịch hẹn khám sàng lọc chuyên khoa.',
         highRisk: '8 – 20 điểm: Nguy cơ cao. Cần liên hệ ngay với trung tâm can thiệp sớm hoặc phòng khám chuyên khoa nhi tại Cần Thơ để được lượng giá trực tiếp 1-1.'
       },
@@ -684,9 +684,9 @@ Lưu ý pháp lý và y tế: ${kb.systemIdentity.disclaimer}
 
 1. THANG SÀNG LỌC M-CHAT-R/F (16-30 THÁNG):
 - Thấp: 0-2 điểm (theo dõi định kỳ).
-- Trung bình: 3-7 điểm (áp dụng can thiệp sớm tại nhà 3-5 phút, khám sàng lọc).
+- Trung bình: 3-7 điểm; cần phỏng vấn theo dõi theo hướng dẫn chính thức.
 - Cao: 8-20 điểm (cần lượng giá chuyên khoa trực tiếp ngay).
-- Các chỉ dấu chính: Câu hỏi 2 (thính lực, quay đầu khi gọi tên), Câu hỏi 5 (chỉ ngón trỏ biểu đạt nhu cầu/sở thích), Câu hỏi 12 (quá tải giác quan âm thanh).
+- Không suy đoán kết quả hoặc số thứ tự câu hỏi từ lời kể; tham khảo bản chính thức và hỏi bác sĩ.
 
 2. TIÊU CHUẨN DSM-5:
 - Nhóm A: Khiếm khuyết giao tiếp và tương tác xã hội (chia sẻ cảm xúc, giao tiếp phi ngôn ngữ, duy trì mối quan hệ).

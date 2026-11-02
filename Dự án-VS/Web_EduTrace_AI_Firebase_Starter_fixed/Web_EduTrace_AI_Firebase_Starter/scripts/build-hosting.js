@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const output = join(root, '.hosting-public');
-const rootFiles = ['index.html', 'admin.html', 'style.css', 'admin.css', 'admin-pagination.css', 'script.js'];
+const rootFiles = ['index.html', 'admin.html', 'workspace.html', 'style.css', 'admin.css', 'admin-pagination.css', 'script.js'];
 const expected = new Map([['', new Set([...rootFiles, 'js', 'images'])]]);
 for (const [dir, extension] of [['js', '.js'], ['images', '.jpg']]) {
   const entries = await readdir(join(root, dir), { withFileTypes: true });

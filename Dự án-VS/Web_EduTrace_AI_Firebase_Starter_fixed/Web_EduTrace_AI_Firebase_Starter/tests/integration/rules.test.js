@@ -37,6 +37,18 @@ test('Rules dự thảo: khách, chủ tài khoản và admin có quyền khác 
     await assertSucceeds(updateDoc(doc(admin, 'bookingRequests/test'), { status: 'confirmed' }));
     const clinician = env.authenticatedContext('clinician1', { clinician: true }).firestore();
     const otherClinician = env.authenticatedContext('clinician2', { clinician: true }).firestore();
+    await assertSucceeds(setDoc(doc(admin, 'clinicianDirectory/clinician1'), {name:'Bác sĩ thử',active:true}));
+    await assertFails(setDoc(doc(owner, 'clinicianDirectory/clinician2'), {name:'Giả mạo',active:true}));
+    const submission = {parentUid:'owner',clinicianUid:'clinician1',topic:'Giao tiếp',content:'Câu trả lời thử',consent:true,status:'new',createdAt:serverTimestamp()};
+    await assertSucceeds(setDoc(doc(owner,'screeningSubmissions/test'),submission));
+    await assertFails(setDoc(doc(owner,'screeningSubmissions/no-consent'),{...submission,consent:false}));
+    await assertFails(setDoc(doc(owner,'screeningSubmissions/no-doctor'),{...submission,clinicianUid:'clinician2'}));
+    await assertSucceeds(getDoc(doc(clinician,'screeningSubmissions/test')));
+    await assertSucceeds(getDoc(doc(owner,'screeningSubmissions/test')));
+    await assertFails(getDoc(doc(otherClinician,'screeningSubmissions/test')));
+    await assertFails(getDoc(doc(admin,'screeningSubmissions/test')));
+    await assertFails(updateDoc(doc(clinician,'screeningSubmissions/test'),{content:'Thay đổi'}));
+    await assertSucceeds(updateDoc(doc(clinician,'screeningSubmissions/test'),{status:'read'}));
     const caseData = { ownerUid: 'clinician1', code: 'CASE-01', assessment: 'Đánh giá', exercise: 'Bài tập', progress: 'Theo dõi', status: 'active', createdAt: serverTimestamp(), updatedAt: serverTimestamp(), lastHistoryId: 'h0' };
     const caseRef = doc(clinician, 'clinicalCases/case1');
     await assertFails(setDoc(caseRef, caseData));

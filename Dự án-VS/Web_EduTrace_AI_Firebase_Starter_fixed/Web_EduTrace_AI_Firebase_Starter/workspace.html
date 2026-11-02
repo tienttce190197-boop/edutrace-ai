@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Không gian làm việc | EduTrace AI</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .workspace-header { background:#10203b; color:white; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px max(24px,calc((100% - 1200px)/2)); }
+    .workspace-header strong { font-size:1.2rem; } .workspace-header button { border:1px solid #88a6b8; border-radius:8px; color:white; background:transparent; padding:9px 14px; cursor:pointer; }
+    #workspaceStatus { max-width:1200px; margin:20px auto; padding:0 24px; }
+  </style>
+</head>
+<body>
+  <header class="workspace-header"><strong>EduTrace AI · Không gian làm việc</strong><button type="button" id="workspaceLogout">Đăng xuất</button></header>
+  <p id="workspaceStatus" role="status">Đang kiểm tra tài khoản...</p>
+  <main id="workspaceRoot"></main>
+  <script type="module" src="js/workspace-page.js"></script>
+</body>
+</html>

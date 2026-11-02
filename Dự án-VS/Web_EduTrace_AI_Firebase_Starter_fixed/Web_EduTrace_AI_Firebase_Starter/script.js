@@ -914,7 +914,7 @@ function analyzeWithDoctorRules(userInput) {
     { text: `Độ tuổi bóc tách: ${detectedAge}`, type: 'age' },
     { text: 'Chậm phát triển ngôn ngữ biểu đạt', type: 'default' },
     { text: 'Giảm tương tác mắt & Phản xạ gọi tên', type: 'default' },
-    { text: 'Chỉ dấu sàng lọc: M-CHAT-R/F mục 2, 5, 12', type: 'mchat' }
+    { text: 'Tham khảo công cụ sàng lọc phù hợp với bác sĩ', type: 'mchat' }
   ];
   let advice = `Chào ba mẹ! Ở mốc ${detectedAge}, việc bé chưa bật âm rõ và ít tương tác ánh mắt là những dấu hiệu cần sự hỗ trợ can thiệp sớm trong giai đoạn vàng. Ba mẹ đừng quá lo lắng hay tự trách mình. EduTrace AI gợi ý các bài tập thực hành 3 – 5 phút từ các trung tâm uy tín tại Ninh Kiều để ba mẹ bắt đầu rèn luyện cùng con tại nhà hôm nay.`;
 
@@ -925,7 +925,7 @@ function analyzeWithDoctorRules(userInput) {
       { text: `Độ tuổi bóc tách: ${detectedAge}`, type: 'age' },
       { text: 'Phổ Tự Kỷ (ASD) / Hành vi rập khuôn', type: 'default' },
       { text: 'Quá tải cảm giác thính giác & xúc giác', type: 'default' },
-      { text: 'Phác đồ điều hòa giác quan M-CHAT-R/F', type: 'mchat' }
+      { text: 'Cần trao đổi với bác sĩ về các biểu hiện', type: 'mchat' }
     ];
     advice = `Chào ba mẹ! Hành vi đung đưa cơ thể hoặc vỗ tay là cơ chế tự nhiên để não bộ của con tự xoa dịu khi bị quá tải cảm giác. Thay vì la mắng hay ép con dừng lại, ba mẹ hãy áp dụng bài tập "Chiếc kén bình yên" và lịch trình trực quan PECS dưới đây từ các bác sĩ chuyên khoa Nhi Ninh Kiều để giúp hệ thần kinh của bé lắng dịu an toàn.`;
   } else if (lower.includes('adhd') || lower.includes('tăng động') || lower.includes('ngồi yên') || lower.includes('chạy nhảy') || lower.includes('mất tập trung') || lower.includes('bộc phát') || lower.includes('la hét')) {

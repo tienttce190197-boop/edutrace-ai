@@ -16,6 +16,8 @@ import { getCurrentUser, recordUserActivity } from "./firebase-auth.js";
 import "./auth-ui.js";
 import "./gemini-cloud-client.js";
 import "./clinical-workspace.js";
+import "./screening-inbox.js";
+import "./parent-referral.js";
 import "./center-workspace.js";
 import "./investor-workspace.js";
 import "./knowledge-cloud.js";
