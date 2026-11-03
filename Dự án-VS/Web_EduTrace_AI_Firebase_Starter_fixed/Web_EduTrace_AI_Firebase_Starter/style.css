@@ -7964,3 +7964,61 @@ body.nav-menu-locked {
 #investorReportSummary { white-space: pre-wrap; }
 .clinical-history-entry { margin: 12px 0; padding: 14px; border: 1px solid #e1e9f2; border-radius: 10px; background: #f8fafc; }
 .clinical-history-entry p { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* Trang chủ cho khách và khu vực dành cho phụ huynh */
+#home.hero-medical {
+  background: linear-gradient(135deg, #f3fbf9 0%, #fff 58%, #eef8fc 100%);
+}
+#home .hero-grid { gap: clamp(32px, 5vw, 76px); }
+#home .hero-content { max-width: 660px; }
+#home .hero-title { font-size: clamp(2.25rem, 3.8vw, 3.75rem); line-height: 1.16; letter-spacing: -.035em; }
+#home .hero-desc { max-width: 58ch; line-height: 1.8; }
+#home .hero-actions { gap: 12px; }
+#home .hero-actions .btn { min-height: 52px; }
+#home .hero-stat-pill { border-radius: 16px; }
+#home .hero-doctor-img { border-radius: 28px; }
+#roleWorkspace.role-workspace:has(#parentWorkspace:not([hidden])) { min-height: 0; padding: clamp(28px, 4vw, 52px) 24px; background: #f2f8f7; }
+#roleWorkspace:has(#parentWorkspace:not([hidden])) .role-workspace-heading {
+  padding: clamp(24px, 3vw, 36px);
+  border-color: #d9ebe7;
+  background: linear-gradient(120deg, #fff 45%, #eaf7f3);
+  border-radius: 22px;
+}
+#roleWorkspace:has(#parentWorkspace:not([hidden])) .role-workspace-heading h2 { letter-spacing: -.03em; }
+#parentWorkspace { gap: 16px; margin-top: 16px; }
+#parentWorkspace .role-workspace-card {
+  min-height: 215px;
+  padding: 26px;
+  border-color: #dcebe8;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(25, 74, 66, .05);
+}
+#parentWorkspace .role-workspace-card strong { font-size: 1.05rem; }
+#parentWorkspace .role-workspace-card > span:not(.role-card-icon):not(.role-card-link) { font-size: .9rem; line-height: 1.65; }
+#parentWorkspace .role-card-icon { width: 48px; height: 48px; border-radius: 15px; }
+#parentReferralPanel {
+  margin-top: 20px;
+  padding: clamp(22px, 3vw, 36px);
+  border: 1px solid #dcebe8;
+  border-radius: 22px;
+  box-shadow: 0 8px 24px rgba(25, 74, 66, .05);
+}
+#parentReferralPanel h3 { font-size: clamp(1.25rem, 2vw, 1.55rem); letter-spacing: -.02em; }
+#parentReferralPanel p { max-width: 78ch; line-height: 1.7; }
+#parentReferralPanel form { gap: 18px; max-width: 850px; }
+#parentReferralPanel label { gap: 8px; color: #253d49; font-size: .92rem; }
+#parentReferralPanel .form-control { width: 100%; min-height: 46px; border-radius: 10px; }
+#parentReferralPanel textarea.form-control { min-height: 110px; }
+#parentReferralPanel label:has(input[type="checkbox"]) { display: flex; align-items: flex-start; gap: 10px; font-weight: 500; line-height: 1.55; }
+#parentReferralPanel input[type="checkbox"] { flex: 0 0 auto; margin-top: .25em; accent-color: #0d9488; }
+#parentReferralPanel .role-workspace-profile { justify-self: start; }
+#parentWorkspace a:focus-visible, #parentReferralPanel :focus-visible, #home a:focus-visible, #home button:focus-visible {
+  outline: 3px solid #167d75;
+  outline-offset: 3px;
+}
+@media (max-width: 720px) {
+  #roleWorkspace.role-workspace:has(#parentWorkspace:not([hidden])) { padding: 24px 16px; }
+  #parentWorkspace .role-workspace-card { min-height: 0; padding: 22px; }
+  #home .hero-title { font-size: clamp(2rem, 8vw, 2.75rem); }
+  #home .hero-actions .btn { width: 100%; justify-content: center; text-align: center; }
+}
