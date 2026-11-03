@@ -278,48 +278,28 @@
         <div class="role-card">
           <div class="role-card-header">
             <div>
-              <h3 id="screeningInboxTitle">Hàng đợi thông tin phụ huynh gửi</h3>
-              <p>Các bài gửi trực tiếp cho tài khoản bác sĩ của bạn.</p>
+              <h3>⚡ Hàng Đợi Ca Test Sàng Lọc Phát Sóng Đồng Thời (Broadcast Queue)</h3>
+              <p>Mọi ca test từ phụ huynh được gửi đồng thời đến tất cả bác sĩ &amp; phòng khám. Ai nhận bệnh và phản
+                hồi sớm nhất sẽ được ghim điều hướng bệnh nhân đến phòng khám đó!</p>
             </div>
+            <button type="button" class="btn btn-sm btn-outline-light" onclick="window.refreshClinicalTestQueues?.()">
+              🔄 Làm Mới Hàng Đợi
+            </button>
           </div>
-          <p id="screeningInboxStatus" role="status">Đang kiểm tra quyền...</p>
-          <div id="screeningInbox" aria-live="polite"></div>
-          <details><summary>Ca mẫu lưu trên thiết bị</summary>
-          <button type="button" class="btn btn-sm btn-outline-light" onclick="window.refreshClinicalTestQueues?.()">Làm mới ca mẫu</button>
           <div id="doctorTestQueueContainer"
             style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
             <!-- Rendered by JS -->
           </div>
-          </details>
         </div>
       </div>
 
       <!-- Tab 1: Cases Table -->
       <div id="doctorTabCases" class="doctor-tab-panel">
-        <section id="clinicalPanel" class="clinical-panel" hidden aria-labelledby="clinicalTitle">
-          <h3 id="clinicalTitle">Hồ sơ ca trên hệ thống</h3>
-          <p id="clinicalMessage" role="status">Đang kiểm tra quyền...</p>
-          <div id="clinicalContent" hidden>
-            <p>Chỉ nhập mã ca; tránh ghi tên hoặc thông tin nhận dạng người bệnh.</p>
-            <div id="clinicalStats" aria-live="polite"></div>
-            <form id="clinicalForm">
-              <label>Mã ca <input class="form-control" name="code" required maxlength="80"></label>
-              <label>Đánh giá <textarea class="form-control" name="assessment" maxlength="2000"></textarea></label>
-              <label>Kế hoạch bài tập <textarea class="form-control" name="exercise" maxlength="2000"></textarea></label>
-              <label>Tiến độ <textarea class="form-control" name="progress" maxlength="2000"></textarea></label>
-              <label>Trạng thái <select class="form-control" name="status"><option value="active">Đang theo dõi</option><option value="completed">Đã hoàn thành</option></select></label>
-              <button type="submit" class="role-workspace-profile">Lưu ca</button>
-              <button type="button" id="clinicalReset">Tạo ca mới</button>
-            </form>
-            <div id="clinicalList" hidden></div>
-            <section id="clinicalHistory" hidden aria-labelledby="clinicalHistoryTitle"><h4 id="clinicalHistoryTitle">Lịch sử ca</h4><p id="clinicalHistoryStatus" role="status"></p><div id="clinicalHistoryList"></div></section>
-          </div>
-        </section>
         <div class="role-card" id="doctorCasesSection">
           <div class="role-card-header">
             <div>
               <h3>Danh Sách Hồ Sơ Ca Can Thiệp Phân Công Cho Bác Sĩ</h3>
-              <p>Ca trên hệ thống hiển thị theo mã; các dòng có tên bên dưới là dữ liệu mẫu trên thiết bị.</p>
+              <p>Theo dõi quá trình tiến bộ của trẻ, nhập nhận xét lâm sàng và chỉ định phác đồ can thiệp sớm</p>
             </div>
             <div class="role-filter-row">
               <div class="role-search-box">
@@ -1441,6 +1421,6 @@
   <!-- Specialized Clinical Knowledge Base & Google Gemini AI Service -->
   <script src="js/gemini-knowledge.js"></script>
   <script src="js/gemini-service.js"></script>
-  <script type="module" src="js/workspace-page.js?v=clinical-trial-3"></script>
+  <script type="module" src="js/workspace-page.js"></script>
 </body>
 </html>

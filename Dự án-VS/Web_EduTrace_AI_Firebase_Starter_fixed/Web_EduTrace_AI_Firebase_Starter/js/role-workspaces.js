@@ -16,7 +16,6 @@ import {
   getAllUsersList
 } from "./firebase-auth.js";
 import { escapeHtml } from "./escape-html.js";
-import { initTestTransfer, resetTestTransfer, submitTestTransfer } from "./test-transfer.js";
 
 // Global Role State
 let currentRoleUser = null;
@@ -200,7 +199,6 @@ export function initRoleWorkspaces() {
 
   // Initialize Parent Clinical Test Modal & Responder Dialogs
   initClinicalAssessmentModal();
-  initTestTransfer();
   initRespondModalEvents();
 
   // Listen to Auth State
@@ -626,11 +624,6 @@ function renderDoctorCasesTable() {
   const searchInput = document.getElementById("doctorCaseSearch");
   const query = (searchInput?.value || "").toLowerCase().trim();
   const filterSyndrome = document.getElementById("doctorSyndromeFilter")?.value || "all";
-  if (searchInput && !searchInput.dataset.listening) {
-    searchInput.dataset.listening = "true";
-    searchInput.addEventListener("input", renderDoctorCasesTable);
-    document.getElementById("doctorSyndromeFilter")?.addEventListener("change", renderDoctorCasesTable);
-  }
 
   const filtered = cases.filter((c) => {
     const matchQuery =
@@ -643,8 +636,7 @@ function renderDoctorCasesTable() {
   });
 
   if (filtered.length === 0) {
-    tbody.innerHTML = `<tr data-empty-demo><td colspan="6" style="text-align: center; color: #94a3b8; padding: 24px;">Không tìm thấy hồ sơ ca mẫu phù hợp.</td></tr>`;
-    window.dispatchEvent(new Event('doctor-cases-rendered'));
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: #94a3b8; padding: 24px;">Không tìm thấy hồ sơ ca can thiệp nào phù hợp.</td></tr>`;
     return;
   }
 
@@ -695,7 +687,12 @@ function renderDoctorCasesTable() {
     btn.onclick = () => openPrescribeModal(btn.dataset.id);
   });
 
-  window.dispatchEvent(new Event('doctor-cases-rendered'));
+  // Search input live handler
+  if (searchInput && !searchInput.dataset.listening) {
+    searchInput.dataset.listening = "true";
+    searchInput.addEventListener("input", renderDoctorCasesTable);
+    document.getElementById("doctorSyndromeFilter")?.addEventListener("change", renderDoctorCasesTable);
+  }
 }
 
 // Modal: Đánh Giá Lâm Sàng Bác Sĩ
@@ -1408,7 +1405,6 @@ export function openClinicalTestModal(branch = "speech", initialData = {}) {
 
   currentTestBranch = branch;
   userTestAnswers = {};
-  resetTestTransfer();
 
   const badgeEl = document.getElementById("testModalBadge");
   const titleEl = document.getElementById("testModalTitle");
@@ -1441,8 +1437,6 @@ export function openClinicalTestModal(branch = "speech", initialData = {}) {
     subtitle = "Dựa trên hồ sơ Dunn Sensory Profile • Đo lường quá tải xúc giác, thính giác & tiền đình";
   }
 
-  branchName = ({speech:'Giao tiếp và vận động', asd:'Tương tác xã hội', adhd:'Chú ý và hành vi', sensory:'Cảm giác'})[branch] || 'Phát triển của trẻ';
-  subtitle = 'Câu hỏi tham khảo để chia sẻ với bác sĩ; không phải thang chẩn đoán.';
   if (badgeEl) {
     badgeEl.textContent = `📋 ${branchName}`;
     badgeEl.style.color = badgeColor;
@@ -1465,6 +1459,7 @@ export function openClinicalTestModal(branch = "speech", initialData = {}) {
       <div class="test-q-card" id="testQCard_${q.id}">
         <div class="test-q-label">
           <strong>#${q.id}.</strong> ${q.text}
+          <div style="font-size: 0.73rem; color: #64748b; margin-top: 2px;"><em>Tiêu chí y khoa: ${q.desc}</em></div>
         </div>
         <div class="test-q-options">
           <button type="button" class="btn-test-opt" data-qid="${q.id}" data-ans="yes">Có</button>
@@ -1550,12 +1545,76 @@ function recalculateLiveTestScore(questions) {
  * Xử lý khi phụ huynh bấm nút Gửi Kết Quả Cho Bác Sĩ & Phòng Khám
  */
 function handleClinicalTestSubmit() {
-  let questions = SPEECH_TEST_QUESTIONS;
-  if (currentTestBranch === "asd") questions = ASD_TEST_QUESTIONS;
-  else if (currentTestBranch === "adhd") questions = ADHD_TEST_QUESTIONS;
-  else if (currentTestBranch === "sensory") questions = SENSORY_TEST_QUESTIONS;
-  void submitTestTransfer({ user: currentRoleUser, branch: currentTestBranch, questions, answers: userTestAnswers });
+  const childName = (document.getElementById("testChildName")?.value || "Bé").trim();
+  const childAge = (document.getElementById("testChildAge")?.value || "Chưa rõ").trim();
+  const parentName = (document.getElementById("testParentName")?.value || "Phụ huynh").trim();
+  const parentPhone = (document.getElementById("testParentPhone")?.value || "").trim();
 
+  let questions = SPEECH_TEST_QUESTIONS;
+  let branchTitle = "Mốc Ngôn Ngữ & Vận Động Denver II (Chậm Nói)";
+  if (currentTestBranch === "asd") {
+    questions = ASD_TEST_QUESTIONS;
+    branchTitle = "Lượng Giá Phổ Tự Kỷ (M-CHAT-R/F, CARS & DSM-5)";
+  } else if (currentTestBranch === "adhd") {
+    questions = ADHD_TEST_QUESTIONS;
+    branchTitle = "Đánh Giá Hành Vi NICHQ Vanderbilt & DSM-5 ADHD";
+  } else if (currentTestBranch === "sensory") {
+    questions = SENSORY_TEST_QUESTIONS;
+    branchTitle = "Hồ Sơ Điều Hòa Giác Quan Dunn Sensory Profile";
+  }
+
+  let score = 0;
+  questions.forEach((q) => {
+    if (userTestAnswers[q.id] === q.riskAnswer) score++;
+  });
+
+  const total = questions.length;
+  const ratio = score / total;
+  let riskLevel = "Nguy cơ Thấp (Low Risk)";
+  if (ratio >= 0.6) riskLevel = "Nguy cơ Cao (High Risk)";
+  else if (ratio >= 0.3) riskLevel = "Nguy cơ Trung Bình (Medium Risk)";
+
+  // Tạo đối tượng ca test lâm sàng mới
+  const newCase = {
+    id: "case-test-" + Date.now(),
+    childName: childName,
+    childAge: childAge,
+    parentName: parentName,
+    parentPhone: parentPhone || "09xx xxx xxx",
+    parentEmail: currentRoleUser?.email || null,
+    branch: currentTestBranch,
+    branchTitle: branchTitle,
+    score: score,
+    maxScore: total,
+    riskLevel: riskLevel,
+    createdAt: new Date().toISOString(),
+    createdTimeFormatted: "Vừa xong",
+    status: "pending_review",
+    respondedBy: null,
+    answers: { ...userTestAnswers }
+  };
+
+  const cases = getClinicalTestCases();
+  cases.unshift(newCase);
+  saveClinicalTestCases(cases);
+
+  activeTestResultCaseId = newCase.id;
+  try {
+    localStorage.setItem("edutrace_last_submitted_test_id", newCase.id);
+  } catch {}
+
+  // Phát sóng sự kiện cho toàn bộ hệ thống
+  window.dispatchEvent(new CustomEvent("edutrace:new-test-case-submitted", { detail: newCase }));
+
+  if (typeof window.showToast === "function") {
+    window.showToast("🔔 Đã phát sóng ca test đồng thời đến tất cả Bác sĩ & Phòng khám!");
+  }
+
+  // Chuyển sang màn hình hiển thị kết quả & chờ phản hồi sớm nhất
+  document.getElementById("clinicalTestFormView").style.display = "none";
+  document.getElementById("clinicalTestResultView").style.display = "block";
+
+  renderParentTestResultView(newCase.id);
 }
 
 /**
@@ -1837,9 +1896,6 @@ export function renderClinicalTestQueues() {
 
   renderQueueTo("doctorTestQueueContainer");
   renderQueueTo("clinicTestQueueContainer");
-  // The legacy queue is device-local sample data, not a new cloud notification.
-  if (docBadge) docBadge.style.display = "none";
-  if (docBanner) docBanner.style.display = "none";
 }
 
 let activeRespondingCaseId = null;

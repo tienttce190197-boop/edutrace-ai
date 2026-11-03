@@ -156,11 +156,7 @@ service cloud.firestore {
       allow update: if request.auth != null && resource.data.clinicianUid == request.auth.uid
         && request.auth.token.get('clinician', false) == true
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
-        && ((resource.data.status == 'new' && request.resource.data.status == 'read')
-          || (resource.data.status in ['new', 'read'] && request.resource.data.status == 'accepted'
-            && !exists(/databases/$(database)/documents/clinicalCases/$(submissionId))
-            && getAfter(/databases/$(database)/documents/clinicalCases/$(submissionId)).data.ownerUid == request.auth.uid
-            && getAfter(/databases/$(database)/documents/clinicalCases/$(submissionId)).data.createdAt == request.time));
+        && resource.data.status == 'new' && request.resource.data.status == 'read';
       allow delete: if false;
     }
     match /centerDirectory/{centerUid} {

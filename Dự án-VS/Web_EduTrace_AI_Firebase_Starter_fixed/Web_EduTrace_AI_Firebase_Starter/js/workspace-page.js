@@ -1,5 +1,5 @@
 ﻿import { subscribeAuth, logoutUser, initAuthService } from './firebase-auth.js';
-import { initRoleWorkspaces, applyRoleWorkspace } from './role-workspaces.js?v=clinical-trial-3';
+import { initRoleWorkspaces, applyRoleWorkspace } from './role-workspaces.js';
 
 const status = document.getElementById('workspaceStatus');
 const logoutBtn = document.getElementById('workspaceLogout');
@@ -52,5 +52,3 @@ subscribeAuth(async user => {
 });
 
 initAuthService();
-import('./clinical-workspace.js?v=clinical-trial-2');
-import('./screening-inbox.js?v=clinical-trial-3');

@@ -49,16 +49,6 @@ test('Rules dự thảo: khách, chủ tài khoản và admin có quyền khác 
     await assertFails(getDoc(doc(admin,'screeningSubmissions/test')));
     await assertFails(updateDoc(doc(clinician,'screeningSubmissions/test'),{content:'Thay đổi'}));
     await assertSucceeds(updateDoc(doc(clinician,'screeningSubmissions/test'),{status:'read'}));
-    await assertFails(updateDoc(doc(clinician,'screeningSubmissions/test'),{status:'accepted'}));
-    const intakeCase = doc(clinician, 'clinicalCases/test');
-    const intakeEntry = {code:'test', assessment:'', exercise:'', progress:'', status:'active'};
-    const acceptance = writeBatch(clinician);
-    acceptance.set(intakeCase, {...intakeEntry, ownerUid:'clinician1', createdAt:serverTimestamp(), updatedAt:serverTimestamp(), lastHistoryId:'initial'});
-    acceptance.set(doc(intakeCase, 'history/initial'), {...intakeEntry, createdAt:serverTimestamp()});
-    acceptance.update(doc(clinician, 'screeningSubmissions/test'), {status:'accepted'});
-    await assertSucceeds(acceptance.commit());
-    await assertFails(updateDoc(doc(clinician,'screeningSubmissions/test'),{status:'accepted'}));
-    await assertFails(getDoc(doc(otherClinician,'clinicalCases/test')));
     const caseData = { ownerUid: 'clinician1', code: 'CASE-01', assessment: 'Đánh giá', exercise: 'Bài tập', progress: 'Theo dõi', status: 'active', createdAt: serverTimestamp(), updatedAt: serverTimestamp(), lastHistoryId: 'h0' };
     const caseRef = doc(clinician, 'clinicalCases/case1');
     await assertFails(setDoc(caseRef, caseData));
