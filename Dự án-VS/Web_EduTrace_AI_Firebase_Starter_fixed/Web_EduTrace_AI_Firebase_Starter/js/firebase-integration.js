@@ -157,7 +157,7 @@ if (firebaseConfigured) {
         "bookingRequests",
         payload,
         "booking",
-        "Đã gửi yêu cầu đặt lịch hẹn 1-1. Trung tâm sẽ liên hệ xác nhận trong 24h."
+        "Đã gửi yêu cầu đặt lịch hẹn 1-1 đến trung tâm bạn chọn."
       );
 
       const modal = document.getElementById("centerBookingModal");

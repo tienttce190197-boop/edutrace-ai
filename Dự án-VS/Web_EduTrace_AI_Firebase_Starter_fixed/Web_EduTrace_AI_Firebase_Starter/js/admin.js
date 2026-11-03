@@ -215,8 +215,9 @@ function setupAdminApp() {
   navItems.forEach((item) => {
     item.addEventListener("click", () => {
       const targetTab = item.dataset.tab;
-      navItems.forEach((nav) => nav.classList.remove("active"));
+      navItems.forEach((nav) => { nav.classList.remove("active"); nav.removeAttribute("aria-current"); });
       item.classList.add("active");
+      item.setAttribute("aria-current", "page");
 
       Object.keys(tabPanels).forEach((key) => {
         if (tabPanels[key]) {
@@ -1228,7 +1229,7 @@ function setupAdminApp() {
         adminKnowledgeTableBody.innerHTML = `
           <tr>
             <td colspan="6" style="text-align: center; padding: 36px; color: #94a3b8;">
-              Chưa có tri thức tùy biến nào do Admin thêm. Nhấn "+ Thêm Tri Thức Mới" để bổ sung chuyên môn, tải file tài liệu và video minh họa.
+              Chưa có tri thức tùy biến. Nhấn "+ Thêm Tri Thức Mới" để bổ sung nội dung và liên kết tài liệu hoặc video.
             </td>
           </tr>
         `;

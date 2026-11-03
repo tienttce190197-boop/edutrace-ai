@@ -23,16 +23,30 @@ function initNavbar() {
   const toggle = document.querySelector('.mobile-toggle');
   const menu = document.querySelector('.nav-menu');
   const navLinks = document.querySelectorAll('.nav-link');
+  const backdrop = document.getElementById('navBackdrop');
+  const setMenuOpen = open => {
+    menu?.classList.toggle('open', open);
+    toggle?.classList.toggle('open', open);
+    toggle?.setAttribute('aria-expanded', String(open));
+    toggle?.setAttribute('aria-label', open ? 'Đóng menu' : 'Mở menu');
+    backdrop?.classList.toggle('open', open);
+    backdrop?.setAttribute('aria-hidden', String(!open));
+    document.body.classList.toggle('nav-menu-locked', open);
+  };
 
   if (toggle && menu) {
     toggle.addEventListener('click', () => {
-      menu.classList.toggle('open');
+      setMenuOpen(!menu.classList.contains('open'));
     });
+    backdrop?.addEventListener('click', () => setMenuOpen(false));
+    menu.querySelectorAll('button').forEach(button => button.addEventListener('click', () => setMenuOpen(false)));
+    document.addEventListener('keydown', event => { if (event.key === 'Escape' && menu.classList.contains('open')) { setMenuOpen(false); toggle.focus(); } });
+    window.addEventListener('resize', () => { if (window.innerWidth > 1350) setMenuOpen(false); });
   }
 
   navLinks.forEach(link => {
     link.addEventListener('click', () => {
-      if (menu) menu.classList.remove('open');
+      setMenuOpen(false);
       navLinks.forEach(l => l.classList.remove('active'));
       link.classList.add('active');
     });
@@ -616,7 +630,7 @@ function initAIAssistant() {
       geminiModeBadge.style.color = '#38bdf8';
       geminiModeBadge.style.borderColor = 'rgba(56, 189, 248, 0.4)';
     } else {
-      geminiModeBadge.textContent = '⚡ Chế độ: Phác đồ chuẩn Bác sĩ Nhi Cần Thơ & M-CHAT-R/F';
+      geminiModeBadge.textContent = '⚡ Chế độ tham khảo theo từ khóa';
       geminiModeBadge.style.color = '#34d399';
       geminiModeBadge.style.borderColor = 'rgba(52, 211, 153, 0.3)';
     }
@@ -684,14 +698,14 @@ function initAIAssistant() {
           setTimeout(() => {
             const ruleResult = analyzeWithDoctorRules(customText);
             renderDynamicAIResult(ruleResult);
-            showToast('Trợ lý AI (Phác đồ Bác sĩ Cần Thơ & M-CHAT) đã phân tích xong bài tập phù hợp!');
+            showToast('Đã hiển thị gợi ý tham khảo theo từ khóa.');
           }, 600);
         }
       } catch (err) {
         console.warn('Gemini API call failed, falling back to Doctor rules:', err);
         const ruleResult = analyzeWithDoctorRules(customText);
         renderDynamicAIResult(ruleResult);
-        showToast('Đã đối soát xong qua Phác đồ Bác sĩ Cần Thơ & M-CHAT-R/F!');
+        showToast('Không kết nối được Gemini; đang hiển thị gợi ý theo từ khóa.');
       } finally {
         setTimeout(() => {
           analyzeBtn.disabled = false;
@@ -792,57 +806,25 @@ async function analyzeWithGeminiAPI(userInput, apiKey) {
 function analyzeWithDoctorRules(userInput) {
   const lower = userInput.toLowerCase();
   const ageMatch = userInput.match(/(\d+([\.,]\d+)?)\s*(tuổi|tháng)/i);
-  const detectedAge = ageMatch ? ageMatch[0] : 'Chưa rõ tuổi (Cần xác định mốc 1.5 - 5 tuổi)';
-  const MANDATORY_DISCLAIMER = 'chat box Ai chỉ là công cụ hỗ trợ và có thể mắc sai sót';
-
-  let matchedCategory = 'speech';
+  const detectedAge = ageMatch ? ageMatch[0] : 'Chưa rõ tuổi';
+  let category = 'speech';
+  let topic = 'Giao tiếp và ngôn ngữ';
   let exerciseIds = ['ex-speech-01', 'ex-speech-02', 'ex-speech-03'];
-  let keywords = [
-    { text: `Độ tuổi bóc tách: ${detectedAge}`, type: 'age' },
-    { text: 'Chậm phát triển ngôn ngữ & giao tiếp', type: 'default' },
-    { text: 'Tiêu chuẩn Denver II Ngôn ngữ & Vận động', type: 'mchat' }
-  ];
-  let advice = `[clinical-test:speech]\n\nChào ba mẹ! Dựa trên các chỉ dấu ngôn ngữ ở mốc ${detectedAge}, việc bé chưa bật âm rõ hoặc vốn từ ít là dấu hiệu cần được lượng giá theo thang Denver II. Bác sĩ khuyến nghị ba mẹ làm ngay bài test chuẩn ngôn ngữ để đối soát khả năng hiểu và diễn đạt của con, đồng thời áp dụng các bài tập thực hành 3 – 5 phút tại nhà hôm nay.\n\n${MANDATORY_DISCLAIMER}`;
-
-  if (lower.includes('stimming') || lower.includes('vỗ tay') || lower.includes('đung đưa') || lower.includes('tự kỷ') || lower.includes('asd') || lower.includes('lắc lư') || lower.includes('kiễng chân') || lower.includes('không nhìn mắt') || lower.includes('không quay đầu')) {
-    matchedCategory = 'asd';
-    exerciseIds = ['ex-asd-01', 'ex-asd-02', 'ex-asd-03'];
-    keywords = [
-      { text: `Độ tuổi bóc tách: ${detectedAge}`, type: 'age' },
-      { text: 'Nhánh Nghi Ngờ Phổ Tự Kỷ (ASD)', type: 'default' },
-      { text: 'Tiêu chuẩn M-CHAT-R/F, CARS & DSM-5', type: 'mchat' }
-    ];
-    advice = `[clinical-test:asd]\n\nChào ba mẹ! Dựa trên tài liệu y khoa chuẩn lâm sàng (M-CHAT-R/F, DSM-5 và CARS), các hành vi như ít nhìn mắt, vỗ tay, đung đưa cơ thể là những chỉ dấu quan trọng cần sàng lọc chuyên sâu. Hệ thống đã chuẩn bị bài test M-CHAT-R/F & CARS cho bé. Sau khi làm xong, kết quả sẽ được phát đồng thời đến các bác sĩ chuyên khoa để phản hồi sớm nhất cho gia đình.\n\n${MANDATORY_DISCLAIMER}`;
-  } else if (lower.includes('adhd') || lower.includes('tăng động') || lower.includes('ngồi yên') || lower.includes('chạy nhảy') || lower.includes('mất tập trung') || lower.includes('bộc phát') || lower.includes('bồn chồn')) {
-    matchedCategory = 'adhd';
-    exerciseIds = ['ex-adhd-01', 'ex-adhd-02', 'ex-adhd-03', 'ex-adhd-04'];
-    keywords = [
-      { text: `Độ tuổi bóc tách: ${detectedAge}`, type: 'age' },
-      { text: 'Nhánh Tăng Động Giảm Chú Ý (ADHD)', type: 'default' },
-      { text: 'Thang NICHQ Vanderbilt & DSM-5 ADHD', type: 'mchat' }
-    ];
-    advice = `[clinical-test:adhd]\n\nChào ba mẹ! Biểu hiện khó ngồi yên, bồn chồn và dễ xao nhãng của bé thuộc nhánh Tăng động giảm chú ý. Theo cẩm nang DSM-5 và thang đo Vanderbilt, ba mẹ nên hoàn thành bài test sàng lọc hành vi này để bác sĩ có cơ sở điều chỉnh phác đồ can thiệp phù hợp nhất cho bé.\n\n${MANDATORY_DISCLAIMER}`;
-  } else if (lower.includes('xúc giác') || lower.includes('sensory') || lower.includes('cắt móng') || lower.includes('gội đầu') || lower.includes('tiếng ồn')) {
-    matchedCategory = 'sensory';
-    exerciseIds = ['ex-asd-01', 'ex-adhd-02'];
-    keywords = [
-      { text: `Độ tuổi bóc tách: ${detectedAge}`, type: 'age' },
-      { text: 'Rối Loạn Điều Hòa Cảm Giác (SI)', type: 'default' },
-      { text: 'Hồ Sơ Giác Quan Dunn Sensory Profile', type: 'mchat' }
-    ];
-    advice = `[clinical-test:sensory]\n\nChào ba mẹ! Việc trẻ sợ cắt móng tay, sợ gội đầu hoặc nhạy cảm quá mức với tiếng ồn xuất phát từ quá tải giác quan. Ba mẹ hãy hoàn thành bài test Sensory Profile bên dưới để xác định chính xác ngưỡng cảm giác của bé.\n\n${MANDATORY_DISCLAIMER}`;
-  }
-
+  if (/tự kỷ|\basd\b|vỗ tay|đung đưa/.test(lower)) { category = 'asd'; topic = 'Tương tác và hành vi'; exerciseIds = ['ex-asd-01', 'ex-asd-02', 'ex-asd-03']; }
+  else if (/adhd|tăng động|mất tập trung|bồn chồn/.test(lower)) { category = 'adhd'; topic = 'Chú ý và hành vi'; exerciseIds = ['ex-adhd-01', 'ex-adhd-02', 'ex-adhd-03']; }
+  else if (/xúc giác|sensory|tiếng ồn/.test(lower)) { category = 'sensory'; topic = 'Cảm giác'; exerciseIds = ['ex-asd-01', 'ex-adhd-02']; }
   return {
-    ageGroup: `${detectedAge} • Can thiệp cá nhân hóa`,
-    clinicalBranch: matchedCategory,
-    extractedKeywords: keywords,
-    advice: advice,
+    ageGroup: detectedAge,
+    clinicalBranch: category,
+    extractedKeywords: [{ text: 'Tuổi được nhắc đến: ' + detectedAge, type: 'age' }, { text: 'Chủ đề tham khảo: ' + topic, type: 'default' }],
+    advice: 'Đây là gợi ý tham khảo theo từ khóa, không phải nhận định của bác sĩ hay kết quả chẩn đoán. Nếu bạn lo ngại về sự phát triển của trẻ, hãy trao đổi với bác sĩ. Phần gợi ý bảng theo dõi bên dưới sẽ cho biết lựa chọn hiện có.',
     recommendedExerciseIds: exerciseIds
   };
 }
 
 function renderDynamicAIResult(result) {
+  const status = document.getElementById('aiAnalysisStatus');
+  if (status) status.textContent = 'GỢI Ý THAM KHẢO';
   renderKeywordsAndAdvice(result.extractedKeywords, result.advice, result.ageGroup);
 
   // Match exercise objects by ID
@@ -854,6 +836,8 @@ function renderDynamicAIResult(result) {
 }
 
 function renderScenario(data) {
+  const status = document.getElementById('aiAnalysisStatus');
+  if (status) status.textContent = 'TÌNH HUỐNG MINH HỌA';
   const textarea = document.getElementById('aiCustomInput');
   if (textarea) textarea.value = data.input;
 
@@ -870,57 +854,13 @@ function renderKeywordsAndAdvice(keywords, advice, ageGroup) {
       let cls = 'keyword-tag';
       if (kw.type === 'age') cls += ' tag-age';
       if (kw.type === 'mchat') cls += ' tag-mchat';
-      return `<span class="${cls}">${kw.text}</span>`;
+      return `<span class="${cls}">${String(kw.text).replace(/[&<>"']/g, char => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", "\"":"&quot;", "'":"&#39;" }[char]))}</span>`;
     }).join('');
   }
 
   if (adviceEl) {
-    let testBranch = null;
-    const testMatch = advice.match(/\[clinical-test:(asd|speech|adhd|sensory)\]/i);
-    if (testMatch) {
-      testBranch = testMatch[1].toLowerCase();
-    }
-
-    let testBranchCardHtml = '';
-    if (testBranch) {
-      let testTitle = 'Bài Test Sàng Lọc Phổ Tự Kỷ M-CHAT-R/F, CARS & DSM-5';
-      let testDesc = 'Được chọn riêng cho tình trạng của bé dựa trên tiêu chuẩn M-CHAT-R/F, CARS và DSM-5.';
-      let testColor = '#8b5cf6';
-      let icon = '🧩';
-      if (testBranch === 'speech') {
-        testTitle = 'Bài Test Mốc Phát Triển Ngôn Ngữ Denver II';
-        testDesc = 'Được chọn riêng để đánh giá vốn từ, khả năng bật âm và hiểu mệnh lệnh của bé.';
-        testColor = '#0284c7';
-        icon = '🗣️';
-      } else if (testBranch === 'adhd') {
-        testTitle = 'Bài Test Hành Vi NICHQ Vanderbilt & DSM-5 ADHD';
-        testDesc = 'Được chọn riêng để đánh giá mức độ giảm chú ý, tăng động và xung động.';
-        testColor = '#ea580c';
-        icon = '⚡';
-      } else if (testBranch === 'sensory') {
-        testTitle = 'Bài Test Hồ Sơ Cảm Giác Dunn Sensory Profile';
-        testDesc = 'Được chọn riêng để đo lường ngưỡng nhạy cảm xúc giác, thính giác & tiền đình.';
-        testColor = '#059669';
-        icon = '💆';
-      }
-
-      testBranchCardHtml = `
-        <div class="workbench-test-card" onclick="window.openClinicalTestModal('${testBranch}')" style="border-left-color: ${testColor};">
-          <div class="wb-test-icon" style="background: ${testColor}15; color: ${testColor};">${icon}</div>
-          <div class="wb-test-info">
-            <span class="wb-test-badge" style="color: ${testColor}; background: ${testColor}15;">📋 BÀI TEST CHUẨN Y KHOA ĐƯỢC AI KÍCH HOẠT</span>
-            <h5 class="wb-test-title">${testTitle}</h5>
-            <p class="wb-test-desc">${testDesc}</p>
-            <div class="wb-test-cta-hint">✓ Sau khi làm xong, kết quả gửi đồng thời đến các bác sĩ &amp; phòng khám để nhận phản hồi sớm nhất!</div>
-          </div>
-          <button type="button" class="btn-wb-do-test" style="background: ${testColor};">
-            Bắt Đầu Làm Test Ngay ➔
-          </button>
-        </div>
-      `;
-    }
-
-    let formattedAdvice = advice
+    const escapeAdvice = value => String(value).replace(/[&<>"']/g, char => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[char]));
+    let formattedAdvice = escapeAdvice(advice)
       .replace(/\[clinical-test:(asd|speech|adhd|sensory)\]/gi, '')
       .replace(/\[kn-video:([a-zA-Z0-9_-]+)\]/gi, (m, id) => {
         return `<span class="badge-kn-ref" onclick="window.openKnowledgeVideoPlayer('${id}')" title="Bấm để xem video">🎬 Xem Video Hướng Dẫn</span>`;
@@ -931,12 +871,11 @@ function renderKeywordsAndAdvice(keywords, advice, ageGroup) {
 
     const disclaimerText = 'chat box Ai chỉ là công cụ hỗ trợ và có thể mắc sai sót';
     let disclaimerHtml = `<div class="ai-mandatory-disclaimer-badge">⚠️ ${disclaimerText}</div>`;
-    if (formattedAdvice.toLowerCase().includes(disclaimerText)) {
+    if (formattedAdvice.toLowerCase().includes(disclaimerText.toLowerCase())) {
       formattedAdvice = formattedAdvice.replace(new RegExp(disclaimerText, 'gi'), '');
     }
 
     adviceEl.innerHTML = `
-      ${testBranchCardHtml}
       <div class="ai-advice-content">${formattedAdvice}</div>
       ${disclaimerHtml}
       <div class="ai-advice-cta-action" style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(255, 255, 255, 0.12); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
@@ -1286,7 +1225,7 @@ function initCenterBookingModal() {
       const parentName = form.querySelector('[name="parentName"]')?.value.trim();
       const centerName = form.querySelector('[name="targetCenter"]')?.value;
 
-      showToast(`Chúc mừng ${parentName}! EduTrace AI đã kết nối lịch can thiệp 1-1 của bạn với ${centerName}. Chuyên viên trung tâm sẽ gọi điện xác nhận trong 24h.`);
+      showToast(`Đã ghi nhận yêu cầu đặt lịch của ${parentName} với ${centerName}.`);
       form.reset();
       modal.classList.remove('active');
       document.body.style.overflow = 'auto';

@@ -2,7 +2,10 @@ import { suggestScreening } from './screening-suggestions.js';
 const input = document.getElementById('aiCustomInput');
 const output = document.getElementById('screeningSuggestion');
 const labels = {milestones:'Bảng theo dõi phát triển CDC 2 tuổi (làm trong website)',mchat_external:'M-CHAT-R/F (mở tài liệu gốc)',vanderbilt_external:'NICHQ Vanderbilt (mở tài liệu gốc)'};
+input?.addEventListener('input', () => output?.replaceChildren());
+document.querySelectorAll('.scenario-chip-btn').forEach(button => button.addEventListener('click', () => output?.replaceChildren()));
 document.getElementById('btnAIAnalyze')?.addEventListener('click', () => {
+  if (!input || !output) return;
   const selection = suggestScreening(input.value);
   output.replaceChildren();
   const info = document.createElement('p');

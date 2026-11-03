@@ -1,54 +1,48 @@
-﻿import { subscribeAuth, logoutUser, initAuthService } from './firebase-auth.js';
-import { initRoleWorkspaces, applyRoleWorkspace } from './role-workspaces.js';
+import { subscribeAuth, logoutUser, initAuthService } from './firebase-auth.js';
+import { applyRoleWorkspace } from './role-workspaces.js';
+import { getApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
 
 const status = document.getElementById('workspaceStatus');
 const logoutBtn = document.getElementById('workspaceLogout');
 const greeting = document.getElementById('workspaceUserGreeting');
 const adminLink = document.getElementById('workspaceAdminLink');
-
+const requestedRole = new URLSearchParams(location.search).get('role');
 logoutBtn?.addEventListener('click', async () => {
-  try {
-    await logoutUser();
-    location.replace('index.html');
-  } catch (err) {
-    console.error('Logout error:', err);
-    location.replace('index.html');
-  }
+  try { await logoutUser(); location.replace('index.html'); }
+  catch { if (status) { status.style.display = 'block'; status.textContent = 'Không đăng xuất được. Vui lòng thử lại.'; } }
 });
-
-// Khoi tao cac su kien va du lieu Role Workspaces
-initRoleWorkspaces();
-
-// Doc tham so vai tro tu URL (?role=doctor | center | investor | admin)
-const urlParams = new URLSearchParams(window.location.search);
-const requestedRole = urlParams.get('role');
-
 subscribeAuth(async user => {
-  if (greeting) {
-    greeting.textContent = user ? `Xin chào, ${user.displayName || user.email}` : '';
-  }
-  if (adminLink) {
-    adminLink.style.display = (user && user.role === 'admin') ? 'inline-flex' : 'none';
-  }
-
-  let activeUser = user;
-  if (!activeUser) {
-    // Neu chua dang nhap, lay vai tro yeu cau hoac mac dinh doctor
-    const role = requestedRole || 'doctor';
-    const names = {
-      doctor: 'ThS. Nguyễn Mai Anh (Bác sĩ Chuyên khoa)',
-      center: 'Trung Tâm Can Thiệp Ánh Sao Ninh Kiều',
-      investor: 'Đối Tác & Nhà Đầu Tư Chiến Lược',
-      admin: 'Ban Quản Trị Hệ Thống'
-    };
-    activeUser = { role, displayName: names[role] || 'Chuyên Gia' };
-  } else if (requestedRole && requestedRole !== activeUser.role && activeUser.role === 'admin') {
-    // Neu la admin, cho phep xem view vai tro cu the theo tham so URL
-    activeUser = { ...activeUser, role: requestedRole };
-  }
-
-  if (status) status.textContent = '';
+  if (!user) return;
+  if (user.role === 'parent') { location.replace('index.html'); return; }
+  if (greeting) greeting.textContent = `Xin chào, ${user.displayName || user.email}`;
+  if (adminLink) adminLink.style.display = user.role === 'admin' ? 'inline-flex' : 'none';
+  const activeUser = requestedRole && user.role === 'admin' ? {...user, role: requestedRole} : user;
+  if (status) { status.style.display = 'none'; status.textContent = ''; }
   applyRoleWorkspace(activeUser);
+  if (activeUser.role === 'doctor') {
+    const name = document.getElementById('doctorPortalName');
+    if (name) name.textContent = user.role === 'doctor' ? (user.displayName || 'Bác sĩ / Chuyên viên') : 'Xem giao diện bác sĩ';
+    if (user.role !== 'doctor') {
+      const inboxStatus = document.getElementById('screeningInboxStatus');
+      if (inboxStatus) inboxStatus.textContent = 'Đăng nhập bằng tài khoản bác sĩ để xem dữ liệu chuyên môn.';
+      return;
+    }
+    try { await Promise.all([import('./clinical-workspace.js'), import('./screening-inbox.js')]); }
+    catch { if (status) { status.style.display = 'block'; status.textContent = 'Không tải được khu vực chuyên môn. Vui lòng tải lại trang.'; } }
+  } else if (activeUser.role === 'center' || activeUser.role === 'investor') {
+    const name = document.getElementById('centerPortalName');
+    if (name) name.textContent = user.role === 'admin' ? 'Xem giao diện trung tâm' : (user.displayName || 'Trung tâm / Đối tác');
+    if (user.role === 'admin') {
+      const panel = document.getElementById('centerPanel');
+      const message = document.getElementById('centerStatus');
+      if (panel) panel.hidden = false;
+      if (message) message.textContent = 'Đăng nhập bằng tài khoản trung tâm để xem và quản lý dữ liệu.';
+      return;
+    }
+    try { await Promise.all([import('./center-workspace.js'), import('./investor-workspace.js')]); }
+    catch { if (status) { status.style.display = 'block'; status.textContent = 'Không tải được khu vực trung tâm. Vui lòng tải lại trang.'; } }
+  }
 });
-
+onAuthStateChanged(getAuth(getApp()), user => { if (!user) location.replace('index.html'); });
 initAuthService();
