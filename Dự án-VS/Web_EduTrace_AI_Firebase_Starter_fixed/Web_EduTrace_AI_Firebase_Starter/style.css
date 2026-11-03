@@ -7756,7 +7756,7 @@ body.nav-menu-locked {
   }
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1450px) {
   .mobile-toggle {
     display: flex !important;
   }
@@ -7810,7 +7810,7 @@ body.nav-menu-locked {
   }
 
   .mobile-auth-guest {
-    display: flex !important;
+    display: flex;
     flex-direction: column !important;
     gap: 10px !important;
     padding-top: 8px !important;
@@ -7841,6 +7841,27 @@ body.nav-menu-locked {
     font-weight: 600 !important;
   }
 }
+
+/* Keep each authentication control in its intended navigation layout. */
+@media (min-width: 1451px) {
+  .nav-menu .mobile-auth-divider,
+  .nav-menu .mobile-auth-guest,
+  .nav-menu .mobile-auth-user { display: none !important; }
+}
+@media (max-width: 1450px) {
+  .nav-actions #navTryAIBtn,
+  .nav-actions #authNavGuest,
+  .nav-actions #authNavUser { display: none !important; }
+  .nav-menu > li { width: 100%; }
+}
+#authNavGuest[style*="display: none"],
+#authNavUser[style*="display: none"],
+#mobileAuthGuest[style*="display: none"],
+#mobileAuthUser[style*="display: none"] { display: none !important; }
+#home .medical-doctor-wrapper { isolation: isolate; }
+#home .doctor-bg-circle, #home .doctor-dot-pattern { z-index: 0; }
+#home .hero-doctor-img { z-index: 1; display: block; }
+#home .floating-support-card { z-index: 2; }
 
 /* Floating Action Tools: Chatbot Widget & Back-to-Top Button */
 .chat-widget-trigger {
