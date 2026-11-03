@@ -19,7 +19,6 @@
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="admin.css">
   <link rel="stylesheet" href="admin-pagination.css">
-  <link rel="stylesheet" href="ui-refinements.css">
 </head>
 
 <body class="admin-body">
@@ -41,7 +40,7 @@
     <div class="admin-header-actions">
       <div class="admin-live-status-pill">
         <span class="admin-pulse-dot"></span>
-        <span>Cổng quản trị</span>
+        <span>Hệ Thống Trực Tuyến</span>
       </div>
       <!-- Admin Profile Pill -->
       <div id="adminHeaderUserPill" style="display: none; align-items: center; gap: 10px;">
@@ -78,11 +77,11 @@
 
       <form id="guardLoginForm" style="text-align: left;">
         <div class="form-group">
-          <label class="form-label" for="guardEmail">Email quản trị viên</label>
+          <label class="form-label">Email quản trị viên</label>
           <input type="email" id="guardEmail" class="form-control" placeholder="admin@edutrace.vn" required>
         </div>
         <div class="form-group">
-          <label class="form-label" for="guardPassword">Mật khẩu</label>
+          <label class="form-label">Mật khẩu</label>
           <input type="password" id="guardPassword" class="form-control" placeholder="••••••••" required>
         </div>
         <button type="submit" class="btn btn-primary" id="guardLoginBtn" style="width: 100%; padding: 12px; margin-top: 6px;">
@@ -106,9 +105,8 @@
   <div class="admin-workspace" id="adminWorkspace">
     <!-- Sidebar Navigation -->
     <aside class="admin-sidebar">
-      <nav aria-label="Điều hướng quản trị">
       <ul class="admin-nav-menu">
-        <li><button type="button" class="admin-nav-item active" data-tab="tabUsers" aria-controls="panelTabUsers" aria-current="page">
+        <li class="admin-nav-item active" data-tab="tabUsers">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
             <circle cx="9" cy="7" r="4"></circle>
@@ -116,8 +114,8 @@
             <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
           </svg>
           <span>Quản lý Người Dùng</span>
-        </button></li>
-        <li><button type="button" class="admin-nav-item" data-tab="tabBookings" aria-controls="panelTabBookings">
+        </li>
+        <li class="admin-nav-item" data-tab="tabBookings">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
             <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -125,24 +123,22 @@
             <line x1="3" y1="10" x2="21" y2="10"></line>
           </svg>
           <span>Lịch Hẹn &amp; Yêu Cầu</span>
-        </button></li>
-        <li><button type="button" class="admin-nav-item" data-tab="tabSystem" aria-controls="panelTabSystem">
+        </li>
+        <li class="admin-nav-item" data-tab="tabSystem">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <circle cx="12" cy="12" r="3"></circle>
             <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
           </svg>
           <span>Thông Tin Hệ Thống</span>
-        </button></li>
-        <li><button type="button" class="admin-nav-item" data-tab="tabInvestor" aria-controls="panelTabInvestor"><span>📊 Báo cáo nhà đầu tư</span></button></li>
-        <li><button type="button" class="admin-nav-item" data-tab="tabAIKnowledge" aria-controls="panelTabAIKnowledge">
+        </li>
+        <li class="admin-nav-item" data-tab="tabInvestor"><span>📊 Báo cáo nhà đầu tư</span></li>
+        <li class="admin-nav-item" data-tab="tabAIKnowledge">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path>
           </svg>
           <span>Quản Trị Tri Thức AI</span>
-        </button></li>
+        </li>
       </ul>
-
-      </nav>
 
       <div class="admin-sidebar-footer">
         <div style="font-size: 0.74rem; color: #94a3b8; line-height: 1.5;">
@@ -262,10 +258,10 @@
                   <circle cx="11" cy="11" r="8"></circle>
                   <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                 </svg>
-                <input type="text" id="userSearchInput" aria-label="Tìm người dùng đã tải" placeholder="Tìm theo tên, email, SĐT...">
+                <input type="text" id="userSearchInput" placeholder="Tìm theo tên, email, SĐT...">
               </div>
 
-              <select id="userRoleFilter" aria-label="Lọc theo vai trò" class="filter-select">
+              <select id="userRoleFilter" class="filter-select">
                 <option value="all">Tất cả vai trò</option>
                 <option value="parent">Phụ huynh</option>
                 <option value="center">Trung tâm can thiệp</option>
@@ -273,7 +269,7 @@
                 <option value="admin">Quản trị viên (Admin)</option>
               </select>
 
-              <select id="userStatusFilter" aria-label="Lọc theo trạng thái tài khoản" class="filter-select">
+              <select id="userStatusFilter" class="filter-select">
                 <option value="all">Tất cả trạng thái</option>
                 <option value="active">Đang hoạt động</option>
                 <option value="blocked">Đang tạm khóa</option>
@@ -335,12 +331,12 @@
               <span>Danh Sách Đơn Đăng Ký Từ Phụ Huynh</span>
             </div>
             <div class="admin-filter-bar">
-              <select id="bookingTypeFilter" aria-label="Lọc theo loại yêu cầu" class="filter-select">
+              <select id="bookingTypeFilter" class="filter-select">
                 <option value="all">Tất cả loại đơn</option>
                 <option value="booking">Đặt lịch can thiệp 1-1 tại trung tâm</option>
                 <option value="consultation">Đăng ký tư vấn tổng quan</option>
               </select>
-              <select id="bookingStatusFilter" aria-label="Lọc theo trạng thái yêu cầu" class="filter-select">
+              <select id="bookingStatusFilter" class="filter-select">
                 <option value="all">Tất cả trạng thái</option>
                 <option value="pending">Chờ tiếp nhận</option>
                 <option value="contacted">Đã liên hệ</option>
@@ -394,17 +390,17 @@
             EduTrace AI là nền tảng kết nối trực tuyến giữa Trung tâm can thiệp sớm và Phụ huynh có con mắc hội chứng tự kỷ (ASD), tăng động giảm chú ý (ADHD) và chậm nói theo cơ chế Trao giá trị trước (Value-First Funnel).
           </p>
 
-          <div class="admin-system-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-bottom: 24px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-bottom: 24px;">
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px;">
               <span style="font-size: 0.75rem; color: #64748b; font-weight: 700;">DỰ ÁN FIREBASE</span>
               <h4 style="margin: 6px 0; color: #1e3a8a;">edutrace-ai</h4>
-              <span style="font-size: 0.8rem; color: #10b981; font-weight: 600;">Sử dụng Authentication &amp; Firestore</span>
+              <span style="font-size: 0.8rem; color: #10b981; font-weight: 600;">● Đang kết nối Authentication &amp; Firestore</span>
             </div>
 
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px;">
               <span style="font-size: 0.75rem; color: #64748b; font-weight: 700;">PHIÊN BẢN CỔNG ADMIN</span>
               <h4 style="margin: 6px 0; color: #0f172a;">v2.1 Enterprise</h4>
-              <span style="font-size: 0.8rem; color: #64748b;">Quyền theo cấu hình hệ thống</span>
+              <span style="font-size: 0.8rem; color: #64748b;">Hỗ trợ phân quyền người dùng đầy đủ</span>
             </div>
 
             <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px;">
@@ -461,8 +457,8 @@
               </p>
             </div>
             <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
-              <input type="password" id="adminGeminiKeyInput" aria-label="Khóa Gemini API" placeholder="Google Gemini API Key..." class="form-control" style="width: 220px; padding: 8px 12px; font-size: 0.85rem;">
-              <select id="adminGeminiModelSelect" aria-label="Chọn mô hình Gemini" class="form-control" style="width: 170px; padding: 8px 12px; font-size: 0.85rem;">
+              <input type="password" id="adminGeminiKeyInput" placeholder="Google Gemini API Key..." class="form-control" style="width: 220px; padding: 8px 12px; font-size: 0.85rem;">
+              <select id="adminGeminiModelSelect" class="form-control" style="width: 170px; padding: 8px 12px; font-size: 0.85rem;">
                 <option value="gemini-3.5-flash-lite">Gemini 3.5 Flash-Lite</option>
                 <option value="gemini-3.6-flash">Gemini 3.6 Flash</option>
                 <option value="gemini-3.8-flash">Gemini 3.8 Flash</option>
@@ -474,7 +470,7 @@
         </div>
 
         <!-- Knowledge Base Stats Overview -->
-        <div class="admin-knowledge-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
           <div class="admin-card" style="padding: 16px;">
             <span style="font-size: 0.74rem; color: #64748b; font-weight: 700;">MODULES Y KHOA NẠP SẴN</span>
             <h3 style="font-size: 1.4rem; color: #2563eb; margin: 4px 0;">5 Modules</h3>
@@ -542,24 +538,24 @@
           <input type="hidden" id="editUserUid" value="">
 
           <div class="form-group">
-            <label class="form-label" for="editUserFullName">Họ và tên *</label>
+            <label class="form-label">Họ và tên *</label>
             <input type="text" id="editUserFullName" class="form-control" placeholder="Ví dụ: Lê Thị Mai" required>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="editUserEmail">Email tài khoản *</label>
+              <label class="form-label">Email tài khoản *</label>
               <input type="email" id="editUserEmail" class="form-control" placeholder="name@example.com" required>
             </div>
             <div class="form-group">
-              <label class="form-label" for="editUserPhone">Số điện thoại *</label>
+              <label class="form-label">Số điện thoại *</label>
               <input type="tel" id="editUserPhone" class="form-control" placeholder="0912 345 678" required>
             </div>
           </div>
 
           <p id="accountManagementHint">Thao tác này chỉ quản lý hồ sơ; không tạo, khóa hoặc xóa tài khoản đăng nhập.</p>
           <div class="form-group" id="groupUserPassword" hidden>
-            <label class="form-label" id="lblUserPassword" for="editUserPassword">Mật khẩu tài khoản *</label>
+            <label class="form-label" id="lblUserPassword">Mật khẩu tài khoản *</label>
             <div class="input-with-icon" style="position: relative;">
               <span class="input-icon-left">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -582,7 +578,7 @@
 
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="editUserRole">Phân quyền vai trò *</label>
+              <label class="form-label">Phân quyền vai trò *</label>
               <select id="editUserRole" class="form-control" required>
                 <option value="parent">Phụ huynh có con cần can thiệp</option>
                 <option value="center">Trung tâm can thiệp sớm / Cơ sở giáo dục</option>
@@ -592,7 +588,7 @@
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label" for="editUserStatus">Trạng thái hồ sơ *</label>
+              <label class="form-label">Trạng thái hồ sơ *</label>
               <select id="editUserStatus" class="form-control" required>
                 <option value="active">Đang hoạt động</option>
                 <option value="blocked">Tạm khóa hồ sơ</option>
@@ -622,7 +618,7 @@
       <div class="admin-modal-header">
         <div>
           <h3 id="modalKnowledgeTitle">Thêm Tri Thức Y Khoa &amp; Tài Liệu / Video Cho AI</h3>
-          <p style="font-size: 0.76rem; color: #94a3b8; margin: 3px 0 0 0;">Quản lý nội dung và liên kết tài liệu, video cho trợ lý AI</p>
+          <p style="font-size: 0.76rem; color: #94a3b8; margin: 3px 0 0 0;">AI sẽ đọc ngữ cảnh này và chủ động gửi video &amp; file cho phụ huynh</p>
         </div>
         <button class="modal-close" id="btnCloseKnowledgeModal" aria-label="Đóng">&times;</button>
       </div>
@@ -632,13 +628,13 @@
 
           <!-- Tiêu đề tri thức -->
           <div class="form-group">
-            <label class="form-label" for="knTitle">Tiêu đề tri thức / Hướng dẫn lâm sàng *</label>
+            <label class="form-label">Tiêu đề tri thức / Hướng dẫn lâm sàng *</label>
             <input type="text" id="knTitle" class="form-control" placeholder="Ví dụ: Chiến lược điều hòa khi trẻ tự kỷ gặp cơn Sensory Meltdown" required>
           </div>
 
           <div class="form-row">
             <div class="form-group">
-              <label class="form-label" for="knCategory">Danh mục chuyên môn *</label>
+              <label class="form-label">Danh mục chuyên môn *</label>
               <select id="knCategory" class="form-control" required>
                 <option value="Chậm nói &amp; Ngôn ngữ">Chậm nói &amp; Ngôn ngữ</option>
                 <option value="Tự kỷ (ASD) &amp; Hành vi">Tự kỷ (ASD) &amp; Hành vi</option>
@@ -648,14 +644,14 @@
               </select>
             </div>
             <div class="form-group">
-              <label class="form-label" for="knAuthor">Tác giả / Bác sĩ bảo trợ chuyên môn *</label>
+              <label class="form-label">Tác giả / Bác sĩ bảo trợ chuyên môn *</label>
               <input type="text" id="knAuthor" class="form-control" placeholder="Ví dụ: BS. CKI Lê Thanh Thảo" required>
             </div>
           </div>
 
           <!-- Nội dung prompt context cho AI -->
           <div class="form-group">
-            <label class="form-label" for="knContent">Nội dung tri thức chi tiết (Prompt Context để Gemini học) *</label>
+            <label class="form-label">Nội dung tri thức chi tiết (Prompt Context để Gemini học) *</label>
             <textarea id="knContent" class="form-control" rows="4" placeholder="Nhập chi tiết hướng dẫn, biểu hiện, phương pháp can thiệp từng bước để Gemini AI học và tư vấn cho phụ huynh..." required></textarea>
           </div>
           <div class="kn-media-section">

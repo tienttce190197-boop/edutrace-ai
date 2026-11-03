@@ -141,14 +141,6 @@ export function setupAuthUI() {
   // Open modal triggers
   navLoginBtn?.addEventListener("click", () => showAuthView("login"));
   navRegisterBtn?.addEventListener("click", () => showAuthView("register"));
-  document.getElementById("parentPortalLink")?.addEventListener("click", (event) => {
-    event.preventDefault();
-    if (getCurrentUser()?.role === "parent") {
-      document.getElementById("roleWorkspace")?.scrollIntoView({ behavior: "smooth" });
-    } else {
-      showAuthView("login");
-    }
-  });
   mobileLoginBtn?.addEventListener("click", () => {
     closeMobileNav();
     showAuthView("login");
@@ -515,10 +507,10 @@ function updateNavbarAuthState(user) {
 
   if (user) {
     // Hide guest buttons, show user pill
-    if (authNavGuest) authNavGuest.hidden = true;
-    if (authNavUser) authNavUser.hidden = false;
-    if (mobileAuthGuest) mobileAuthGuest.hidden = true;
-    if (mobileAuthUser) mobileAuthUser.hidden = false;
+    if (authNavGuest) authNavGuest.style.display = "none";
+    if (authNavUser) authNavUser.style.display = "flex";
+    if (mobileAuthGuest) mobileAuthGuest.style.display = "none";
+    if (mobileAuthUser) mobileAuthUser.style.display = "block";
 
     const displayName = user.displayName || user.email.split("@")[0];
     const initial = displayName.charAt(0).toUpperCase();
@@ -578,10 +570,10 @@ function updateNavbarAuthState(user) {
     }
   } else {
     // Show guest buttons, hide user pill
-    if (authNavGuest) authNavGuest.hidden = false;
-    if (authNavUser) authNavUser.hidden = true;
-    if (mobileAuthGuest) mobileAuthGuest.hidden = false;
-    if (mobileAuthUser) mobileAuthUser.hidden = true;
+    if (authNavGuest) authNavGuest.style.display = "flex";
+    if (authNavUser) authNavUser.style.display = "none";
+    if (mobileAuthGuest) mobileAuthGuest.style.display = "flex";
+    if (mobileAuthUser) mobileAuthUser.style.display = "none";
 
     const adminLink = document.getElementById("btnAdminPortal");
     const mobileAdminLink = document.getElementById("mobileAdminPortal");

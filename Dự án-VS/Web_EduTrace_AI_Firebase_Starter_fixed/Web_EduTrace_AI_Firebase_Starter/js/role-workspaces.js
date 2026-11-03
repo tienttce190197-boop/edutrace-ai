@@ -298,7 +298,7 @@ function initLocalData() {
 // APPLY ROLE WORKSPACE (THE CORE UI SWITCHER)
 // ==========================================================================
 export function applyRoleWorkspace(user) {
-  const role = user ? (user.role === "investor" ? "center" : user.role) : "parent";
+  const role = user ? user.role : "parent";
   const parentContainer = document.getElementById("parentViewSection");
   const doctorWorkspace = document.getElementById("doctorRoleWorkspace");
   const clinicWorkspace = document.getElementById("clinicRoleWorkspace");

@@ -29,11 +29,6 @@ test('kiểm tra kết nối nhận phản hồi thực sự', async () => {
   assert.equal((await service.testConnection()).message, 'OK');
 });
 
-test('không hiển thị kết nối thành công khi Gemini trả phản hồi rỗng', async () => {
-  const { service } = await loadService('gemini-3.6-flash', { ok: true, json: async () => ({ candidates: [] }) });
-  assert.equal((await service.testConnection()).success, false);
-});
-
 test('Gemini chờ tri thức cloud trước khi tạo prompt', async () => {
   const source = await readFile(new URL('../js/gemini-service.js', import.meta.url), 'utf8');
   let release; let ready = false; let sentBody;

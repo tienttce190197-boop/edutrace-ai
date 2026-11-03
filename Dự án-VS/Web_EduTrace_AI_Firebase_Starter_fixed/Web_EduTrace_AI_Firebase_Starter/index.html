@@ -23,9 +23,7 @@
     rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="roles.css">
-  <link rel="stylesheet" href="ui-refinements.css">
+  <link rel="stylesheet" href="style.css">`r`n  <link rel="stylesheet" href="roles.css">
 </head>
 
 <body>
@@ -58,7 +56,7 @@
           </svg>
           Đặt Lịch Can Thiệp 1-1
         </a>
-        <a href="#roleWorkspace" id="parentPortalLink" class="top-bar-link">
+        <a href="javascript:void(0)" onclick="document.getElementById('navLoginBtn')?.click()" class="top-bar-link">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
             <circle cx="12" cy="7" r="4"></circle>
@@ -83,7 +81,7 @@
 
       <!-- Desktop Nav Menu -->
       <nav>
-        <ul class="nav-menu" id="primaryNavigation">
+        <ul class="nav-menu">
           <li><a href="#home" class="nav-link active">Trang chủ</a></li>
           <li><a href="#services-medical" class="nav-link">Dịch vụ can thiệp</a></li>
           <li><a href="#overview-process" class="nav-link">Quy trình 4 bước</a></li>
@@ -101,7 +99,7 @@
             <button type="button" class="btn btn-outline-light" id="mobileLoginBtn">Đăng Nhập</button>
             <button type="button" class="btn btn-primary" id="mobileRegisterBtn">Đăng Ký Tài Khoản</button>
           </li>
-          <li class="mobile-auth-user" id="mobileAuthUser" hidden>
+          <li class="mobile-auth-user" id="mobileAuthUser" style="display: none;">
             <div class="mobile-user-card">
               <div>
                 <span class="mobile-user-name" id="mobileUserName">Người dùng</span>
@@ -153,7 +151,7 @@
         </div>
 
         <!-- Authenticated User Dropdown -->
-        <div class="auth-nav-user" id="authNavUser" hidden>
+        <div class="auth-nav-user" id="authNavUser" style="display: none;">
           <button type="button" class="nav-user-pill" id="navUserMenuToggle" aria-expanded="false">
             <div class="nav-user-avatar" id="navUserAvatar">U</div>
             <div class="nav-user-meta">
@@ -212,7 +210,7 @@
           </div>
         </div>
 
-        <button type="button" class="mobile-toggle" aria-label="Mở menu" aria-expanded="false" aria-controls="primaryNavigation">
+        <button class="mobile-toggle" aria-label="Mở menu">
           <span></span>
           <span></span>
           <span></span>
@@ -234,37 +232,41 @@
         </div>
         <button type="button" class="role-workspace-profile" id="roleWorkspaceProfile">Thông tin tài khoản <span aria-hidden="true">↗</span></button>
       </div>
-      <div class="role-workspace-cards parent-shortcuts" id="parentWorkspace" hidden>
-        <a class="role-workspace-card" href="#ai-assistant-demo"><span class="role-card-icon" aria-hidden="true">✦</span><strong>Trợ lý AI</strong><span>Chia sẻ điều bạn quan tâm và tìm thông tin hỗ trợ.</span><span class="role-card-link">Mở trợ lý →</span></a>
-        <a class="role-workspace-card" href="#parentReferralPanel"><span class="role-card-icon" aria-hidden="true">♡</span><strong>Theo dõi &amp; gửi bác sĩ</strong><span>Ghi nhận thông tin và chọn bác sĩ để chia sẻ.</span><span class="role-card-link">Mở biểu mẫu →</span></a>
-        <a class="role-workspace-card" href="#exercise-hub"><span class="role-card-icon" aria-hidden="true">✚</span><strong>Bài tập tại nhà</strong><span>Khám phá tài nguyên và các bài tập hiện có.</span><span class="role-card-link">Xem bài tập →</span></a>
-        <a class="role-workspace-card" href="#contact"><span class="role-card-icon" aria-hidden="true">✉</span><strong>Liên hệ tư vấn</strong><span>Gửi yêu cầu để đội ngũ EduTrace liên hệ hỗ trợ.</span><span class="role-card-link">Gửi yêu cầu →</span></a>
+      <div class="role-workspace-cards" id="parentWorkspace" hidden>
+        <a class="role-workspace-card" href="#ai-assistant-demo"><span class="role-card-icon">✦</span><strong>Trợ lý AI</strong><span>Trao đổi về những điều bạn quan tâm trong quá trình phát triển của trẻ.</span><span class="role-card-link">Mở trợ lý →</span></a>
+        <a class="role-workspace-card" href="#exercise-hub"><span class="role-card-icon">✚</span><strong>Bài tập tại nhà</strong><span>Khám phá tài nguyên và bài tập hỗ trợ.</span><span class="role-card-link">Xem bài tập →</span></a>
+        <a class="role-workspace-card" href="#contact"><span class="role-card-icon">✉</span><strong>Liên hệ tư vấn</strong><span>Gửi yêu cầu để được đội ngũ EduTrace hỗ trợ.</span><span class="role-card-link">Gửi yêu cầu →</span></a>
       </div>
-      <section id="parentReferralPanel" class="clinical-panel parent-referral" hidden aria-labelledby="parentReferralTitle">
-        <div class="parent-referral-heading"><div><span class="parent-eyebrow">ĐỒNG HÀNH CÙNG BÁC SĨ</span><h3 id="parentReferralTitle">Theo dõi phát triển và gửi bác sĩ</h3><p>Chọn nội dung, kiểm tra thông tin và gửi cho bác sĩ bạn lựa chọn.</p></div><span class="parent-referral-chip">Chia sẻ theo sự đồng ý của bạn</span></div>
-        <div class="parent-referral-note">Bảng mốc phát triển 2 tuổi phỏng theo CDC, không thay thế sàng lọc hoặc chẩn đoán. Nếu trẻ mất kỹ năng hoặc bạn lo ngại, hãy trao đổi với bác sĩ. Hạn chế nhập thông tin định danh.</div>
-        <p id="parentReferralStatus" class="parent-referral-status" role="status">Đang tải danh sách bác sĩ...</p>
-        <form id="parentReferralForm" class="parent-referral-form">
-          <div class="parent-form-grid"><label>Vấn đề quan tâm <select name="topic" class="form-control" required><option value="">Chọn vấn đề</option><option>Giao tiếp và ngôn ngữ</option><option>Tương tác xã hội</option><option>Chú ý và hành vi</option><option>Vấn đề khác</option></select></label>
-          <label>Hình thức chia sẻ <select name="mode" class="form-control"><option value="note">Gửi ghi chú</option><option value="milestones">Làm bảng mốc CDC 2 tuổi</option><option value="mchat_external">Chia sẻ kết quả M-CHAT-R/F từ tài liệu gốc</option><option value="vanderbilt_external">Chia sẻ kết quả Vanderbilt từ tài liệu gốc</option></select></label></div>
-          <div id="externalAssessment" class="parent-form-panel" hidden>
-            <p id="externalAssessmentDescription"></p><a id="externalAssessmentSource" href="https://www.mchatscreen.com/mchat-rf/translations/" target="_blank" rel="noopener noreferrer">Mở tài liệu gốc ↗</a>
+      <section id="parentReferralPanel" class="clinical-panel" hidden aria-labelledby="parentReferralTitle">
+        <h3 id="parentReferralTitle">Theo dõi phát triển và gửi bác sĩ</h3>
+        <p>Bảng theo dõi 2 tuổi phỏng theo CDC, không thay thế sàng lọc hoặc chẩn đoán. Nếu trẻ mất kỹ năng hoặc bạn lo ngại, hãy trao đổi với bác sĩ, không chờ làm bảng. Hãy hạn chế thông tin định danh.</p>
+        <p id="parentReferralStatus" role="status">Đang tải danh sách bác sĩ...</p>
+        <form id="parentReferralForm">
+          <label>Vấn đề quan tâm <select name="topic" class="form-control" required><option value="">Chọn vấn đề</option><option>Giao tiếp và ngôn ngữ</option><option>Tương tác xã hội</option><option>Chú ý và hành vi</option><option>Vấn đề khác</option></select></label>
+          <label>Hình thức <select name="mode" class="form-control"><option value="note">Gửi ghi chú</option><option value="milestones">Làm bảng mốc CDC 2 tuổi</option><option value="mchat_external">Chia sẻ kết quả M-CHAT-R/F từ tài liệu gốc</option><option value="vanderbilt_external">Chia sẻ kết quả Vanderbilt từ tài liệu gốc</option></select></label>
+          <div id="externalAssessment" hidden>
+            <p id="externalAssessmentDescription"></p>
+            <a id="externalAssessmentSource" href="https://www.mchatscreen.com/mchat-rf/translations/" target="_blank" rel="noopener noreferrer">Mở tài liệu gốc</a>
             <p>Hoàn thành biểu mẫu từ nguồn gốc cùng chuyên gia khi cần, rồi nhập thông tin bạn muốn chia sẻ vào ô ghi chú. Ứng dụng không tự chấm điểm hay diễn giải biểu mẫu này.</p>
             <label>Tuổi của trẻ (tháng) <input name="externalAgeMonths" type="number" class="form-control"></label>
           </div>
-          <div id="milestoneQuestions" class="parent-form-panel" hidden>
+          <div id="milestoneQuestions" hidden>
             <p>Chỉ dùng bảng này cho trẻ từ 24 đến dưới 30 tháng. Nếu trẻ sinh non hơn 3 tuần, hãy hỏi bác sĩ về tuổi hiệu chỉnh.</p>
             <label>Tuổi của trẻ (tháng) <input name="ageMonths" type="number" min="24" max="29" class="form-control"></label>
-            <div id="milestoneItems" class="parent-milestones"></div>
+            <div id="milestoneItems"></div>
             <p>Khi yêu cầu nhận xét, tuổi và câu trả lời sẽ được gửi đến dịch vụ Gemini. Không gửi ghi chú hoặc tên trẻ trong bước này.</p>
-            <label class="parent-check"><input type="checkbox" name="aiConsent"><span>Tôi đồng ý gửi tuổi và câu trả lời tới Gemini để nhận nhận xét.</span></label>
-            <button type="button" id="milestoneAiReview" class="role-workspace-profile parent-secondary-button">Nhận nhận xét từ AI</button>
-            <section id="milestoneAiResult" class="parent-ai-result" hidden aria-live="polite"><p><strong>Đây là đánh giá từ AI dựa theo tài liệu nên chưa phải là đánh giá chính xác cuối cùng.</strong> AI có thể mắc sai sót; hãy hỏi bác sĩ, không dùng kết quả để chẩn đoán.</p><p id="milestoneAiText" style="white-space: pre-wrap"></p><p>Hãy chọn bác sĩ bên dưới và đồng ý chia sẻ để gửi câu trả lời cho bác sĩ tư vấn.</p></section>
+            <label><input type="checkbox" name="aiConsent"> Tôi đồng ý gửi tuổi và câu trả lời tới Gemini để nhận nhận xét.</label>
+            <button type="button" id="milestoneAiReview" class="role-workspace-profile">Nhận nhận xét từ AI</button>
+            <section id="milestoneAiResult" hidden aria-live="polite">
+              <p><strong>Đây là đánh giá từ AI dựa theo tài liệu nên chưa phải là đánh giá chính xác cuối cùng.</strong> AI có thể mắc sai sót; hãy hỏi bác sĩ, không dùng kết quả để chẩn đoán.</p>
+              <p id="milestoneAiText" style="white-space: pre-wrap"></p>
+              <p>Hãy chọn bác sĩ bên dưới và đồng ý chia sẻ để gửi câu trả lời cho bác sĩ tư vấn.</p>
+            </section>
           </div>
-          <label>Ghi chú muốn chia sẻ <textarea name="content" class="form-control" maxlength="3000" placeholder="Nhập điều bạn muốn trao đổi với bác sĩ"></textarea></label>
+          <label>Ghi chú muốn chia sẻ <textarea name="content" class="form-control" maxlength="3000"></textarea></label>
           <label>Bác sĩ nhận <select name="clinicianUid" class="form-control" required><option value="">Chọn bác sĩ</option></select></label>
-          <label class="parent-check"><input type="checkbox" name="consent" required><span>Tôi đồng ý gửi nội dung trên cho bác sĩ đã chọn.</span></label>
-          <div><button type="submit" class="role-workspace-profile parent-submit">Gửi cho bác sĩ</button></div>
+          <label><input type="checkbox" name="consent" required> Tôi đồng ý gửi nội dung trên cho bác sĩ đã chọn.</label>
+          <button type="submit" class="role-workspace-profile">Gửi cho bác sĩ</button>
         </form>
       </section>
       <div class="role-workspace-cards" id="doctorWorkspace" hidden>
@@ -430,7 +432,7 @@
             </div>
             <div class="fsc-info">
               <span class="fsc-number">24/7</span>
-              <span class="fsc-label">Thông tin hỗ trợ tham khảo</span>
+              <span class="fsc-label">Hỗ Trợ Khẩn Cấp &amp; Tư Vấn Y Khoa</span>
             </div>
           </div>
         </div>
@@ -603,7 +605,7 @@
           <div class="hc-text-col">
             <h3>Chúng Tôi Luôn Ở Đây 24/7</h3>
             <div class="emergency-badge-text">24/7</div>
-            <p>Trợ lý AI cung cấp thông tin tham khảo và có thể mắc sai sót.</p>
+            <p>Hỗ trợ khẩn cấp &amp; Trợ lý AI y tế đồng hành tin cậy.</p>
             <button type="button" class="btn btn-outline-medical btn-sm btn-pill" onclick="window.openEduTraceChat && window.openEduTraceChat()">
               Nhận Hỗ Trợ Ngay
             </button>
@@ -1115,7 +1117,7 @@
                   </svg>
                   Kết Quả Bóc Tách Từ Khóa &amp; Nhu Cầu Can Thiệp
                 </h4>
-                <span id="aiAnalysisStatus" style="font-size: 0.75rem; color: #34d399; font-weight: 700;">TÌNH HUỐNG MINH HỌA</span>
+                <span style="font-size: 0.75rem; color: #34d399; font-weight: 700;">✓ ĐÃ ĐỐI SOÁT XONG</span>
               </div>
 
               <div class="keyword-tags-wrap" id="aiAnalysisKeywords">
@@ -1125,7 +1127,6 @@
               <div class="ai-advice-bubble" id="aiAdviceText">
                 <!-- Advice message rendered via script.js -->
               </div>
-              <div id="screeningSuggestion" class="screening-suggestion" aria-live="polite"></div>
             </div>
 
             
@@ -1445,7 +1446,7 @@
       </div>
 
       <!-- Data Source Cards -->
-      <div class="data-source-grid">
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
         <div class="pilot-stat-box" style="text-align: left; background: white; border-radius: 12px; padding: 22px;">
           <div style="font-size: 1.8rem; margin-bottom: 8px;">📊</div>
           <h4 style="font-size: 1.05rem; font-weight: 700; color: #0f172a; margin-bottom: 6px;">Cơ Sở Dịch Tễ Thực Địa
@@ -2716,7 +2717,6 @@
   
   <!-- Firebase integration: remains in demo mode until js/firebase-config.js is configured. -->
   <script type="module" src="js/firebase-integration.js"></script>
-  <script type="module" src="js/screening-suggestions-ui.js"></script>
   <script type="module" src="js/role-workspaces.js"></script>
   <!-- Floating Back to Top Button -->
   <button type="button" id="btnBackToTop" class="btn-back-to-top" title="Lên đầu trang" aria-label="Lên đầu trang">
