@@ -1488,6 +1488,7 @@ export function openClinicalTestModal(branch = "speech", initialData = {}) {
         if (ans === "yes") btn.classList.add("active-yes");
         else btn.classList.add("active-no");
 
+        recalculateLiveTestScore(questions);
       };
     });
   }
@@ -1496,7 +1497,53 @@ export function openClinicalTestModal(branch = "speech", initialData = {}) {
   document.getElementById("clinicalTestFormView").style.display = "block";
   document.getElementById("clinicalTestResultView").style.display = "none";
 
+  recalculateLiveTestScore(questions);
   modal.classList.add("active");
+}
+
+/**
+ * Tính điểm trực tiếp khi phụ huynh trả lời câu hỏi
+ */
+function recalculateLiveTestScore(questions) {
+  let score = 0;
+  questions.forEach((q) => {
+    const ans = userTestAnswers[q.id];
+    const card = document.getElementById(`testQCard_${q.id}`);
+    if (ans && ans === q.riskAnswer) {
+      score++;
+      card?.classList.add("flagged-risk");
+    } else {
+      card?.classList.remove("flagged-risk");
+    }
+  });
+
+  const scoreText = document.getElementById("testLiveScoreText");
+  const riskBadge = document.getElementById("testRiskBadgeEl");
+  const noteEl = document.getElementById("testScaleStandardNote");
+
+  const total = questions.length;
+  if (scoreText) scoreText.textContent = `${score}/${total}`;
+
+  let riskLevel = "low";
+  let riskLabel = "Nguy cơ Thấp (Phát triển phù hợp)";
+  let noteText = "Điểm số nằm trong phạm vi phát triển an toàn. Gia đình tiếp tục theo dõi các mốc tiếp theo.";
+
+  const ratio = score / total;
+  if (ratio >= 0.6) {
+    riskLevel = "high";
+    riskLabel = "Nguy cơ Cao (Cần lượng giá chuyên khoa)";
+    noteText = "Điểm số chạm ngưỡng chỉ dấu lâm sàng. Cần liên hệ ngay bác sĩ/trung tâm để khám trực tiếp 1-1.";
+  } else if (ratio >= 0.3) {
+    riskLevel = "medium";
+    riskLabel = "Nguy cơ Trung Bình (Cần can thiệp sớm)";
+    noteText = "Có một số chỉ dấu chậm phát triển. Khuyến nghị áp dụng bài tập 3-5 phút tại nhà và đặt lịch tham vấn.";
+  }
+
+  if (riskBadge) {
+    riskBadge.className = `test-risk-badge ${riskLevel}`;
+    riskBadge.textContent = riskLabel;
+  }
+  if (noteEl) noteEl.textContent = noteText;
 }
 
 /**
