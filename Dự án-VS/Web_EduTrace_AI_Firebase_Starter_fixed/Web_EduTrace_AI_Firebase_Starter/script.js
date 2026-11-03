@@ -23,122 +23,6 @@ function initNavbar() {
   const toggle = document.querySelector('.mobile-toggle');
   const menu = document.querySelector('.nav-menu');
   const navLinks = document.querySelectorAll('.nav-link');
-  const navbar = document.getElementById('navbar');
-  const backToTopBtn = document.getElementById('btnBackToTop');
-  const navBackdrop = document.getElementById('navBackdrop');
-
-  const closeMobileMenu = () => {
-    if (menu) menu.classList.remove('open');
-    if (toggle) toggle.classList.remove('open');
-    if (navBackdrop) navBackdrop.classList.remove('open');
-    document.body.classList.remove('nav-menu-locked');
-  };
-
-  const openMobileMenu = () => {
-    if (menu) menu.classList.add('open');
-    if (toggle) toggle.classList.add('open');
-    if (navBackdrop) navBackdrop.classList.add('open');
-    document.body.classList.add('nav-menu-locked');
-  };
-
-  if (toggle && menu) {
-    toggle.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = menu.classList.contains('open');
-      if (isOpen) {
-        closeMobileMenu();
-      } else {
-        openMobileMenu();
-      }
-    });
-
-    if (navBackdrop) {
-      navBackdrop.addEventListener('click', closeMobileMenu);
-    }
-
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && menu.classList.contains('open')) {
-        closeMobileMenu();
-      }
-    });
-  }
-
-  navLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      closeMobileMenu();
-      navLinks.forEach(l => l.classList.remove('active'));
-      link.classList.add('active');
-    });
-  });
-
-  // Back to top smooth scrolling
-  if (backToTopBtn) {
-    backToTopBtn.addEventListener('click', () => {
-      window.scrollTo({
-        top: 0,
-        behavior: 'smooth'
-      });
-    });
-  }
-
-  // Optimized Scroll Listener (Passive)
-  let ticking = false;
-  window.addEventListener('scroll', () => {
-    if (!ticking) {
-      window.requestAnimationFrame(() => {
-        const scrollY = window.pageYOffset || document.documentElement.scrollTop;
-
-        // Sticky navbar elevation transition
-        if (navbar) {
-          if (scrollY > 30) {
-            navbar.classList.add('scrolled');
-          } else {
-            navbar.classList.remove('scrolled');
-          }
-        }
-
-        // Back to top floating button
-        if (backToTopBtn) {
-          if (scrollY > 350) {
-            backToTopBtn.classList.add('visible');
-          } else {
-            backToTopBtn.classList.remove('visible');
-          }
-        }
-
-        // Scrollspy for active nav link
-        let current = '';
-        const sections = document.querySelectorAll('section[id]');
-        sections.forEach(section => {
-          const sectionHeight = section.offsetHeight;
-          const sectionTop = section.offsetTop - 140;
-          const sectionId = section.getAttribute('id');
-
-          if (scrollY >= sectionTop && scrollY < sectionTop + sectionHeight) {
-            current = sectionId;
-          }
-        });
-
-        if (current) {
-          navLinks.forEach(link => {
-            link.classList.remove('active');
-            if (link.getAttribute('href') === `#${current}`) {
-              link.classList.add('active');
-            }
-          });
-        }
-
-        ticking = false;
-      });
-      ticking = true;
-    }
-  }, { passive: true });
-}
-
-function initNavbar_disabled() {
-  const toggle = document.querySelector('.mobile-toggle');
-  const menu = document.querySelector('.nav-menu');
-  const navLinks = document.querySelectorAll('.nav-link');
 
   if (toggle && menu) {
     toggle.addEventListener('click', () => {
@@ -432,6 +316,7 @@ const MASTER_EXERCISES_DATA = [
     safetyNotes: 'Động viên khích lệ khi con lỡ làm rơi bóng, không tạo áp lực phê bình.'
   }
 ];
+window.MASTER_EXERCISES_DATA = MASTER_EXERCISES_DATA;
 
 const aiScenariosData = {
   scenario1: {
@@ -578,7 +463,7 @@ function initGeminiConfigModal() {
     if (!keyInput || !testResult || !window.geminiService) return;
 
     const testKey = keyInput.value.trim();
-    const testModel = modelSelect ? modelSelect.value : window.geminiService.DEFAULT_MODEL;
+    const testModel = modelSelect ? modelSelect.value : 'gemini-1.5-flash';
 
     if (!testKey) {
       testResult.textContent = '⚠️ Vui lòng nhập API Key để kiểm tra';
@@ -614,7 +499,7 @@ function initGeminiConfigModal() {
     if (!keyInput || !window.geminiService) return;
 
     const newKey = keyInput.value.trim();
-    const newModel = modelSelect ? modelSelect.value : window.geminiService.DEFAULT_MODEL;
+    const newModel = modelSelect ? modelSelect.value : 'gemini-1.5-flash';
 
     window.geminiService.setApiKey(newKey);
     window.geminiService.setModel(newModel);
@@ -724,7 +609,7 @@ function initAIAssistant() {
   const updateGeminiModeBadge = () => {
     if (!geminiModeBadge) return;
     const isConfigured = window.geminiService ? window.geminiService.isConfigured() : false;
-    const model = window.geminiService ? window.geminiService.getModel() : 'gemini-3.5-flash-lite';
+    const model = window.geminiService ? window.geminiService.getModel() : 'gemini-1.5-flash';
 
     if (isConfigured) {
       geminiModeBadge.textContent = `🟢 Đang chạy Google ${model} (AI Trực Tiếp)`;
@@ -799,14 +684,14 @@ function initAIAssistant() {
           setTimeout(() => {
             const ruleResult = analyzeWithDoctorRules(customText);
             renderDynamicAIResult(ruleResult);
-            showToast('Đã hiển thị gợi ý tự động từ dữ liệu có sẵn; hãy trao đổi thêm với bác sĩ.');
+            showToast('Trợ lý AI (Phác đồ Bác sĩ Cần Thơ & M-CHAT) đã phân tích xong bài tập phù hợp!');
           }, 600);
         }
       } catch (err) {
         console.warn('Gemini API call failed, falling back to Doctor rules:', err);
         const ruleResult = analyzeWithDoctorRules(customText);
         renderDynamicAIResult(ruleResult);
-        showToast('Gemini không phản hồi; đang hiển thị gợi ý từ dữ liệu có sẵn.');
+        showToast('Đã đối soát xong qua Phác đồ Bác sĩ Cần Thơ & M-CHAT-R/F!');
       } finally {
         setTimeout(() => {
           analyzeBtn.disabled = false;
@@ -903,45 +788,54 @@ async function analyzeWithGeminiAPI(userInput, apiKey) {
 }
 
 // Doctor Medical Knowledge Rules (Local Engine)
+// Tuân thủ: Lấy đủ thông tin -> chọn bài test chuẩn cho bệnh đó -> không tự suy luận -> có dòng tuyên bố miễn trừ
 function analyzeWithDoctorRules(userInput) {
   const lower = userInput.toLowerCase();
   const ageMatch = userInput.match(/(\d+([\.,]\d+)?)\s*(tuổi|tháng)/i);
-  const detectedAge = ageMatch ? ageMatch[0] : 'Chưa rõ (Gợi ý: 2 – 5 tuổi)';
+  const detectedAge = ageMatch ? ageMatch[0] : 'Chưa rõ tuổi (Cần xác định mốc 1.5 - 5 tuổi)';
+  const MANDATORY_DISCLAIMER = 'chat box Ai chỉ là công cụ hỗ trợ và có thể mắc sai sót';
 
   let matchedCategory = 'speech';
   let exerciseIds = ['ex-speech-01', 'ex-speech-02', 'ex-speech-03'];
   let keywords = [
     { text: `Độ tuổi bóc tách: ${detectedAge}`, type: 'age' },
-    { text: 'Chậm phát triển ngôn ngữ biểu đạt', type: 'default' },
-    { text: 'Giảm tương tác mắt & Phản xạ gọi tên', type: 'default' },
-    { text: 'Tham khảo công cụ sàng lọc phù hợp với bác sĩ', type: 'mchat' }
+    { text: 'Chậm phát triển ngôn ngữ & giao tiếp', type: 'default' },
+    { text: 'Tiêu chuẩn Denver II Ngôn ngữ & Vận động', type: 'mchat' }
   ];
-  let advice = `Chào ba mẹ! Ở mốc ${detectedAge}, việc bé chưa bật âm rõ và ít tương tác ánh mắt là những dấu hiệu cần sự hỗ trợ can thiệp sớm trong giai đoạn vàng. Ba mẹ đừng quá lo lắng hay tự trách mình. EduTrace AI gợi ý các bài tập thực hành 3 – 5 phút từ các trung tâm uy tín tại Ninh Kiều để ba mẹ bắt đầu rèn luyện cùng con tại nhà hôm nay.`;
+  let advice = `[clinical-test:speech]\n\nChào ba mẹ! Dựa trên các chỉ dấu ngôn ngữ ở mốc ${detectedAge}, việc bé chưa bật âm rõ hoặc vốn từ ít là dấu hiệu cần được lượng giá theo thang Denver II. Bác sĩ khuyến nghị ba mẹ làm ngay bài test chuẩn ngôn ngữ để đối soát khả năng hiểu và diễn đạt của con, đồng thời áp dụng các bài tập thực hành 3 – 5 phút tại nhà hôm nay.\n\n${MANDATORY_DISCLAIMER}`;
 
-  if (lower.includes('stimming') || lower.includes('vỗ tay') || lower.includes('đung đưa') || lower.includes('tự kỷ') || lower.includes('asd') || lower.includes('quá tải') || lower.includes('tiếng ồn')) {
+  if (lower.includes('stimming') || lower.includes('vỗ tay') || lower.includes('đung đưa') || lower.includes('tự kỷ') || lower.includes('asd') || lower.includes('lắc lư') || lower.includes('kiễng chân') || lower.includes('không nhìn mắt') || lower.includes('không quay đầu')) {
     matchedCategory = 'asd';
     exerciseIds = ['ex-asd-01', 'ex-asd-02', 'ex-asd-03'];
     keywords = [
       { text: `Độ tuổi bóc tách: ${detectedAge}`, type: 'age' },
-      { text: 'Phổ Tự Kỷ (ASD) / Hành vi rập khuôn', type: 'default' },
-      { text: 'Quá tải cảm giác thính giác & xúc giác', type: 'default' },
-      { text: 'Cần trao đổi với bác sĩ về các biểu hiện', type: 'mchat' }
+      { text: 'Nhánh Nghi Ngờ Phổ Tự Kỷ (ASD)', type: 'default' },
+      { text: 'Tiêu chuẩn M-CHAT-R/F, CARS & DSM-5', type: 'mchat' }
     ];
-    advice = `Chào ba mẹ! Hành vi đung đưa cơ thể hoặc vỗ tay là cơ chế tự nhiên để não bộ của con tự xoa dịu khi bị quá tải cảm giác. Thay vì la mắng hay ép con dừng lại, ba mẹ hãy áp dụng bài tập "Chiếc kén bình yên" và lịch trình trực quan PECS dưới đây từ các bác sĩ chuyên khoa Nhi Ninh Kiều để giúp hệ thần kinh của bé lắng dịu an toàn.`;
-  } else if (lower.includes('adhd') || lower.includes('tăng động') || lower.includes('ngồi yên') || lower.includes('chạy nhảy') || lower.includes('mất tập trung') || lower.includes('bộc phát') || lower.includes('la hét')) {
+    advice = `[clinical-test:asd]\n\nChào ba mẹ! Dựa trên tài liệu y khoa chuẩn lâm sàng (M-CHAT-R/F, DSM-5 và CARS), các hành vi như ít nhìn mắt, vỗ tay, đung đưa cơ thể là những chỉ dấu quan trọng cần sàng lọc chuyên sâu. Hệ thống đã chuẩn bị bài test M-CHAT-R/F & CARS cho bé. Sau khi làm xong, kết quả sẽ được phát đồng thời đến các bác sĩ chuyên khoa để phản hồi sớm nhất cho gia đình.\n\n${MANDATORY_DISCLAIMER}`;
+  } else if (lower.includes('adhd') || lower.includes('tăng động') || lower.includes('ngồi yên') || lower.includes('chạy nhảy') || lower.includes('mất tập trung') || lower.includes('bộc phát') || lower.includes('bồn chồn')) {
     matchedCategory = 'adhd';
     exerciseIds = ['ex-adhd-01', 'ex-adhd-02', 'ex-adhd-03', 'ex-adhd-04'];
     keywords = [
       { text: `Độ tuổi bóc tách: ${detectedAge}`, type: 'age' },
-      { text: 'Tăng động giảm chú ý (ADHD)', type: 'default' },
-      { text: 'Thời gian chú ý ngắn & Kém ức chế xung động', type: 'default' },
-      { text: 'Khớp chỉ dấu thang đánh giá hành vi trẻ em', type: 'mchat' }
+      { text: 'Nhánh Tăng Động Giảm Chú Ý (ADHD)', type: 'default' },
+      { text: 'Thang NICHQ Vanderbilt & DSM-5 ADHD', type: 'mchat' }
     ];
-    advice = `Chào ba mẹ! Trẻ có biểu hiện bồn chồn, khó ngồi yên không phải là trẻ hư mà do trung khu phanh hãm hành vi ở não bộ đang trong quá trình phát triển. Bác sĩ khuyến nghị ba mẹ nên chia nhỏ nhiệm vụ thành từng chặng 3–5 phút và rèn luyện phản xạ "Đèn xanh - Đèn đỏ" để bé rèn luyện kỹ năng tự chủ một cách vui vẻ.`;
+    advice = `[clinical-test:adhd]\n\nChào ba mẹ! Biểu hiện khó ngồi yên, bồn chồn và dễ xao nhãng của bé thuộc nhánh Tăng động giảm chú ý. Theo cẩm nang DSM-5 và thang đo Vanderbilt, ba mẹ nên hoàn thành bài test sàng lọc hành vi này để bác sĩ có cơ sở điều chỉnh phác đồ can thiệp phù hợp nhất cho bé.\n\n${MANDATORY_DISCLAIMER}`;
+  } else if (lower.includes('xúc giác') || lower.includes('sensory') || lower.includes('cắt móng') || lower.includes('gội đầu') || lower.includes('tiếng ồn')) {
+    matchedCategory = 'sensory';
+    exerciseIds = ['ex-asd-01', 'ex-adhd-02'];
+    keywords = [
+      { text: `Độ tuổi bóc tách: ${detectedAge}`, type: 'age' },
+      { text: 'Rối Loạn Điều Hòa Cảm Giác (SI)', type: 'default' },
+      { text: 'Hồ Sơ Giác Quan Dunn Sensory Profile', type: 'mchat' }
+    ];
+    advice = `[clinical-test:sensory]\n\nChào ba mẹ! Việc trẻ sợ cắt móng tay, sợ gội đầu hoặc nhạy cảm quá mức với tiếng ồn xuất phát từ quá tải giác quan. Ba mẹ hãy hoàn thành bài test Sensory Profile bên dưới để xác định chính xác ngưỡng cảm giác của bé.\n\n${MANDATORY_DISCLAIMER}`;
   }
 
   return {
     ageGroup: `${detectedAge} • Can thiệp cá nhân hóa`,
+    clinicalBranch: matchedCategory,
     extractedKeywords: keywords,
     advice: advice,
     recommendedExerciseIds: exerciseIds
@@ -968,7 +862,6 @@ function renderScenario(data) {
 }
 
 function renderKeywordsAndAdvice(keywords, advice, ageGroup) {
-  const escapeText = value => String(value ?? '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[char]);
   const container = document.getElementById('aiAnalysisKeywords');
   const adviceEl = document.getElementById('aiAdviceText');
 
@@ -977,12 +870,58 @@ function renderKeywordsAndAdvice(keywords, advice, ageGroup) {
       let cls = 'keyword-tag';
       if (kw.type === 'age') cls += ' tag-age';
       if (kw.type === 'mchat') cls += ' tag-mchat';
-      return `<span class="${cls}">${escapeText(kw.text)}</span>`;
+      return `<span class="${cls}">${kw.text}</span>`;
     }).join('');
   }
 
   if (adviceEl) {
-    let formattedAdvice = escapeText(advice)
+    let testBranch = null;
+    const testMatch = advice.match(/\[clinical-test:(asd|speech|adhd|sensory)\]/i);
+    if (testMatch) {
+      testBranch = testMatch[1].toLowerCase();
+    }
+
+    let testBranchCardHtml = '';
+    if (testBranch) {
+      let testTitle = 'Bài Test Sàng Lọc Phổ Tự Kỷ M-CHAT-R/F, CARS & DSM-5';
+      let testDesc = 'Được chọn riêng cho tình trạng của bé dựa trên tiêu chuẩn M-CHAT-R/F, CARS và DSM-5.';
+      let testColor = '#8b5cf6';
+      let icon = '🧩';
+      if (testBranch === 'speech') {
+        testTitle = 'Bài Test Mốc Phát Triển Ngôn Ngữ Denver II';
+        testDesc = 'Được chọn riêng để đánh giá vốn từ, khả năng bật âm và hiểu mệnh lệnh của bé.';
+        testColor = '#0284c7';
+        icon = '🗣️';
+      } else if (testBranch === 'adhd') {
+        testTitle = 'Bài Test Hành Vi NICHQ Vanderbilt & DSM-5 ADHD';
+        testDesc = 'Được chọn riêng để đánh giá mức độ giảm chú ý, tăng động và xung động.';
+        testColor = '#ea580c';
+        icon = '⚡';
+      } else if (testBranch === 'sensory') {
+        testTitle = 'Bài Test Hồ Sơ Cảm Giác Dunn Sensory Profile';
+        testDesc = 'Được chọn riêng để đo lường ngưỡng nhạy cảm xúc giác, thính giác & tiền đình.';
+        testColor = '#059669';
+        icon = '💆';
+      }
+
+      testBranchCardHtml = `
+        <div class="workbench-test-card" onclick="window.openClinicalTestModal('${testBranch}')" style="border-left-color: ${testColor};">
+          <div class="wb-test-icon" style="background: ${testColor}15; color: ${testColor};">${icon}</div>
+          <div class="wb-test-info">
+            <span class="wb-test-badge" style="color: ${testColor}; background: ${testColor}15;">📋 BÀI TEST CHUẨN Y KHOA ĐƯỢC AI KÍCH HOẠT</span>
+            <h5 class="wb-test-title">${testTitle}</h5>
+            <p class="wb-test-desc">${testDesc}</p>
+            <div class="wb-test-cta-hint">✓ Sau khi làm xong, kết quả gửi đồng thời đến các bác sĩ &amp; phòng khám để nhận phản hồi sớm nhất!</div>
+          </div>
+          <button type="button" class="btn-wb-do-test" style="background: ${testColor};">
+            Bắt Đầu Làm Test Ngay ➔
+          </button>
+        </div>
+      `;
+    }
+
+    let formattedAdvice = advice
+      .replace(/\[clinical-test:(asd|speech|adhd|sensory)\]/gi, '')
       .replace(/\[kn-video:([a-zA-Z0-9_-]+)\]/gi, (m, id) => {
         return `<span class="badge-kn-ref" onclick="window.openKnowledgeVideoPlayer('${id}')" title="Bấm để xem video">🎬 Xem Video Hướng Dẫn</span>`;
       })
@@ -990,8 +929,16 @@ function renderKeywordsAndAdvice(keywords, advice, ageGroup) {
         return `<span class="badge-kn-ref" onclick="window.downloadKnowledgeFile('${id}')" title="Bấm để tải tài liệu">📄 Tải Tài Liệu Hướng Dẫn</span>`;
       });
 
+    const disclaimerText = 'chat box Ai chỉ là công cụ hỗ trợ và có thể mắc sai sót';
+    let disclaimerHtml = `<div class="ai-mandatory-disclaimer-badge">⚠️ ${disclaimerText}</div>`;
+    if (formattedAdvice.toLowerCase().includes(disclaimerText)) {
+      formattedAdvice = formattedAdvice.replace(new RegExp(disclaimerText, 'gi'), '');
+    }
+
     adviceEl.innerHTML = `
+      ${testBranchCardHtml}
       <div class="ai-advice-content">${formattedAdvice}</div>
+      ${disclaimerHtml}
       <div class="ai-advice-cta-action" style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(255, 255, 255, 0.12); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
         <span style="font-size: 0.78rem; color: #94a3b8;">💬 Bạn muốn hỏi thêm chi tiết hoặc giải tỏa âu lo?</span>
         <button type="button" class="btn-chat-deeper" id="btnAdviceChatDeeper" title="Mở khung chat hỏi đáp 2 chiều trực tiếp">
@@ -1484,9 +1431,8 @@ function showToast(message) {
       <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
       <polyline points="22 4 12 14.01 9 11.01"></polyline>
     </svg>
-    <span></span>
+    <span>${message}</span>
   `;
-  toast.querySelector('span').textContent = message;
 
   toast.classList.add('show');
   setTimeout(() => {

@@ -1,52 +1,54 @@
-import { getApp } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js';
-import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/12.19.0/firebase-auth.js';
-import { initAuthService, subscribeAuth, logoutUser } from './firebase-auth.js';
-import { updateRoleWorkspace } from './role-workspace.js';
-import { pageForRole } from './role-routing.js';
+﻿import { subscribeAuth, logoutUser, initAuthService } from './firebase-auth.js';
+import { initRoleWorkspaces, applyRoleWorkspace } from './role-workspaces.js';
 
 const status = document.getElementById('workspaceStatus');
-const root = document.getElementById('workspaceRoot');
-let generation = 0;
-let loaded = false;
-document.getElementById('workspaceLogout').addEventListener('click', async () => {
-  try { await logoutUser(); location.replace('index.html'); }
-  catch { status.textContent = 'Không đăng xuất được. Vui lòng thử lại.'; }
+const logoutBtn = document.getElementById('workspaceLogout');
+const greeting = document.getElementById('workspaceUserGreeting');
+const adminLink = document.getElementById('workspaceAdminLink');
+
+logoutBtn?.addEventListener('click', async () => {
+  try {
+    await logoutUser();
+    location.replace('index.html');
+  } catch (err) {
+    console.error('Logout error:', err);
+    location.replace('index.html');
+  }
 });
 
+// Khoi tao cac su kien va du lieu Role Workspaces
+initRoleWorkspaces();
+
+// Doc tham so vai tro tu URL (?role=doctor | center | investor | admin)
+const urlParams = new URLSearchParams(window.location.search);
+const requestedRole = urlParams.get('role');
+
 subscribeAuth(async user => {
-  if (!user) return;
-  const current = ++generation;
-  const destination = pageForRole(user.role);
-  if (destination !== 'workspace.html') { location.replace(destination); return; }
-  try {
-    if (!loaded) {
-      const response = await fetch('index.html', {cache:'no-cache'});
-      if (!response.ok) throw new Error('Không tải được giao diện.');
-      const html = new DOMParser().parseFromString(await response.text(), 'text/html');
-      const workspace = html.getElementById('roleWorkspace');
-      if (!workspace) throw new Error('Thiếu giao diện.');
-      workspace.querySelector('#parentWorkspace')?.remove();
-      workspace.querySelector('#parentReferralPanel')?.remove();
-      workspace.querySelector('#roleWorkspaceProfile')?.remove();
-      workspace.querySelector('.role-workspace-footer')?.remove();
-      for (const link of workspace.querySelectorAll('.role-workspace-card')) {
-        if (!['#clinicalPanel', '#centerPanel', '#investorReportPanel'].includes(link.getAttribute('href'))) link.remove();
-      }
-      if (current !== generation) return;
-      root.replaceChildren(workspace);
-      loaded = true;
-    }
-    if (user.role === 'doctor') {
-      await import('./clinical-workspace.js');
-      await import('./screening-inbox.js');
-    } else {
-      await import('./center-workspace.js');
-      await import('./investor-workspace.js');
-    }
-    if (current !== generation) return;
-    updateRoleWorkspace(user);
-    status.textContent = '';
-  } catch (error) { if (current === generation) status.textContent = 'Không tải được không gian làm việc. Vui lòng thử lại.'; }
+  if (greeting) {
+    greeting.textContent = user ? `Xin chào, ${user.displayName || user.email}` : '';
+  }
+  if (adminLink) {
+    adminLink.style.display = (user && user.role === 'admin') ? 'inline-flex' : 'none';
+  }
+
+  let activeUser = user;
+  if (!activeUser) {
+    // Neu chua dang nhap, lay vai tro yeu cau hoac mac dinh doctor
+    const role = requestedRole || 'doctor';
+    const names = {
+      doctor: 'ThS. Nguyễn Mai Anh (Bác sĩ Chuyên khoa)',
+      center: 'Trung Tâm Can Thiệp Ánh Sao Ninh Kiều',
+      investor: 'Đối Tác & Nhà Đầu Tư Chiến Lược',
+      admin: 'Ban Quản Trị Hệ Thống'
+    };
+    activeUser = { role, displayName: names[role] || 'Chuyên Gia' };
+  } else if (requestedRole && requestedRole !== activeUser.role && activeUser.role === 'admin') {
+    // Neu la admin, cho phep xem view vai tro cu the theo tham so URL
+    activeUser = { ...activeUser, role: requestedRole };
+  }
+
+  if (status) status.textContent = '';
+  applyRoleWorkspace(activeUser);
 });
-onAuthStateChanged(getAuth(getApp()), user => { if (!user) location.replace('index.html'); });
+
 initAuthService();

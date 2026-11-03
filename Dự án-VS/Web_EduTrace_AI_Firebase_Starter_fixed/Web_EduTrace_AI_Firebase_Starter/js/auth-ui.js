@@ -8,6 +8,7 @@
 import {
   initAuthService,
   subscribeAuth,
+  getCurrentUser,
   loginWithEmail,
   registerWithEmail,
   loginWithGoogle,
@@ -550,13 +551,19 @@ function updateNavbarAuthState(user) {
       mobileAdminLink.style.display = user.role === "admin" ? "block" : "none";
     }
 
-    // Update activities count badge
+    // Update activities count badge (gồm cả lịch hẹn và bài test sàng lọc)
     const activities = getUserActivities();
+    let clinicalCases = [];
+    try {
+      const raw = localStorage.getItem("edutrace_clinical_test_cases");
+      if (raw) clinicalCases = JSON.parse(raw);
+    } catch {}
+    const totalCount = activities.length + clinicalCases.length;
     const countBadge = document.getElementById("userBookingsCount");
     if (countBadge) {
-      if (activities.length > 0) {
+      if (totalCount > 0) {
         countBadge.style.display = "inline-flex";
-        countBadge.textContent = activities.length;
+        countBadge.textContent = totalCount;
       } else {
         countBadge.style.display = "none";
       }
@@ -572,6 +579,10 @@ function updateNavbarAuthState(user) {
     const mobileAdminLink = document.getElementById("mobileAdminPortal");
     if (adminLink) adminLink.style.display = "none";
     if (mobileAdminLink) mobileAdminLink.style.display = "none";
+
+    // Khi dang xuat hoac la khach, an thong bao phan hoi bac si
+    const alertEl = document.getElementById("parentClinicalResponseAlert");
+    if (alertEl) alertEl.style.display = "none";
   }
 }
 
@@ -642,7 +653,30 @@ function renderUserBookingsList() {
   if (!container) return;
 
   const activities = getUserActivities();
-  if (activities.length === 0) {
+  const currentUser = getCurrentUser();
+  let clinicalCases = [];
+
+  // Chỉ tải ca test sàng lọc nếu đã đăng nhập vào tài khoản PHỤ HUYNH
+  if (currentUser && currentUser.role === "parent") {
+    try {
+      const raw = localStorage.getItem("edutrace_clinical_test_cases");
+      if (raw) {
+        const allCases = JSON.parse(raw);
+        clinicalCases = allCases.filter((c) => {
+          if (c.parentEmail && currentUser.email) {
+            return c.parentEmail.toLowerCase() === currentUser.email.toLowerCase();
+          }
+          const lastId = localStorage.getItem("edutrace_last_submitted_test_id");
+          if (lastId && c.id === lastId) return true;
+          if (currentUser.phone && c.parentPhone && c.parentPhone.includes(currentUser.phone)) return true;
+          if (currentUser.displayName && c.parentName && c.parentName.toLowerCase().includes(currentUser.displayName.toLowerCase())) return true;
+          return !c.parentEmail;
+        });
+      }
+    } catch {}
+  }
+
+  if (activities.length === 0 && clinicalCases.length === 0) {
     container.innerHTML = `
       <div class="empty-activity-state">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="1.5">
@@ -651,7 +685,7 @@ function renderUserBookingsList() {
           <line x1="8" y1="2" x2="8" y2="6"></line>
           <line x1="3" y1="10" x2="21" y2="10"></line>
         </svg>
-        <p>Bạn chưa gửi yêu cầu đặt lịch can thiệp hoặc đăng ký tư vấn nào.</p>
+        <p>Bạn chưa gửi yêu cầu đặt lịch can thiệp hoặc nộp bài test sàng lọc nào.</p>
         <a href="#ai-assistant-demo" class="btn btn-sm btn-primary" onclick="document.getElementById('userProfileModal').classList.remove('active');">
           Thử Trợ Lý AI &amp; Đặt Lịch Ngay
         </a>
@@ -660,7 +694,82 @@ function renderUserBookingsList() {
     return;
   }
 
-  container.innerHTML = activities
+  // 1. Render danh sách bài test sàng lọc lâm sàng (ưu tiên hiển thị trên cùng)
+  const clinicalHtml = clinicalCases
+    .map((c) => {
+      const isResponded = c.status === "responded" && c.respondedBy;
+      const resp = c.respondedBy;
+
+      return `
+        <div class="user-activity-item ${isResponded ? "has-doctor-response" : ""}" style="${
+        isResponded
+          ? "border: 2px solid #10b981; background: #f0fdf4; border-radius: 12px; padding: 16px; margin-bottom: 12px;"
+          : "border-left: 4px solid #ea580c; border-radius: 12px; padding: 14px; margin-bottom: 12px; background: #fffaf5;"
+      }">
+          <div class="activity-details" style="width: 100%;">
+            <div class="activity-title-row" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; flex-wrap: wrap;">
+              <h4 style="margin: 0; font-size: 0.98rem; color: #0f172a; font-weight: 700;">
+                📋 Sàng Lọc: ${escapeHtml(c.childName)} (${escapeHtml(c.childAge)}) - ${escapeHtml(c.branchTitle)}
+              </h4>
+              <span class="activity-status-badge" style="${
+                isResponded
+                  ? "background: #10b981; color: #ffffff; font-weight: 700; padding: 4px 10px; border-radius: 99px; font-size: 0.76rem;"
+                  : "background: #ea580c; color: #ffffff; font-weight: 700; padding: 4px 10px; border-radius: 99px; font-size: 0.76rem;"
+              }">
+                ${isResponded ? "✓ BÁC SĨ ĐÃ PHẢN HỒI" : "⏳ Đang Chờ Bác Sĩ Tiếp Nhận"}
+              </span>
+            </div>
+            <p class="activity-meta" style="margin: 6px 0 10px; font-size: 0.78rem; color: #64748b; display: flex; gap: 14px; flex-wrap: wrap;">
+              <span>⏱️ Nộp lúc: <strong>${escapeHtml(c.createdTimeFormatted || "Gần đây")}</strong></span>
+              <span>📊 Kết quả: <strong>${c.score}/${c.maxScore} điểm</strong> (${escapeHtml(c.riskLevel)})</span>
+            </p>
+
+            ${
+              isResponded
+                ? `
+              <div style="background: #ffffff; border-radius: 10px; padding: 12px 16px; border-left: 3px solid #10b981; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.04);">
+                <div style="font-size: 0.85rem; font-weight: 700; color: #065f46; margin-bottom: 4px;">
+                  👨‍⚕️ ${escapeHtml(resp.responderName)} • ${escapeHtml(resp.clinicName)} <span style="font-size: 0.76rem; color: #64748b; font-weight: normal;">(${escapeHtml(resp.respondedAt)})</span>
+                </div>
+                <div style="font-size: 0.84rem; color: #1e293b; line-height: 1.5; font-style: italic; margin-bottom: 6px;">
+                  "${escapeHtml(resp.doctorFeedback)}"
+                </div>
+                <div style="font-size: 0.78rem; color: #475569;">
+                  📍 <strong>Địa chỉ đón tiếp bé:</strong> ${escapeHtml(resp.clinicAddress)} • 📞 <strong>Hotline:</strong> <a href="tel:${escapeHtml(resp.clinicPhone)}" style="color: #059669; font-weight: 700;">${escapeHtml(resp.clinicPhone)}</a>
+                </div>
+              </div>
+            `
+                : `
+              <div style="font-size: 0.8rem; color: #b45309; background: #fffbeb; padding: 8px 12px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #f59e0b;">
+                Hệ thống đã phát sóng ca test này đến toàn bộ các Bác sĩ &amp; Cơ sở can thiệp. Bác sĩ/phòng khám nào tiếp nhận trước sẽ được ghim phản hồi trực tiếp ngay tại đây!
+              </div>
+            `
+            }
+
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-sm btn-primary" onclick="window.viewClinicalTestResponse?.('${c.id}'); document.getElementById('userProfileModal')?.classList.remove('active');" style="${
+        isResponded ? "background: #059669; border-color: #059669;" : "background: #2563eb; border-color: #2563eb;"
+      } font-weight: 700; padding: 7px 14px;">
+                ${isResponded ? "🔍 Xem Toàn Bộ Đánh Giá &amp; Phác Đồ Bác Sĩ ➔" : "👁️ Xem Lại Kết Quả Bài Test"}
+              </button>
+              ${
+                isResponded && resp.clinicPhone
+                  ? `
+                <a href="tel:${escapeHtml(resp.clinicPhone)}" class="btn btn-sm btn-outline-light" style="font-size: 0.78rem; padding: 7px 14px; text-decoration: none; color: #059669; border-color: #10b981;">
+                  📞 Gọi Ngay Cho Bác Sĩ
+                </a>
+              `
+                  : ""
+              }
+            </div>
+          </div>
+        </div>
+      `;
+    })
+    .join("");
+
+  // 2. Render danh sách đặt lịch hẹn hoặc tư vấn
+  const bookingHtml = activities
     .map((act) => {
       const isBooking = act.type === "booking";
       const title = isBooking
@@ -672,7 +781,7 @@ function renderUserBookingsList() {
       const phone = act.data?.parentPhone || act.data?.phone || "";
 
       return `
-        <div class="user-activity-item">
+        <div class="user-activity-item" style="border-radius: 12px; padding: 14px; margin-bottom: 12px;">
           <div class="activity-icon ${isBooking ? "icon-booking" : "icon-lead"}">
             ${
               isBooking
@@ -695,7 +804,11 @@ function renderUserBookingsList() {
       `;
     })
     .join("");
+
+  container.innerHTML = clinicalHtml + bookingHtml;
 }
+
+window.renderUserBookingsList = renderUserBookingsList;
 
 function translateSchedule(val) {
   if (val === "weekend") return "Thứ 7 hoặc Chủ Nhật";

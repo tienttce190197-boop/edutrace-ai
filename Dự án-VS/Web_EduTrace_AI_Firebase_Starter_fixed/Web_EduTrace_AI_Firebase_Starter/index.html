@@ -23,7 +23,7 @@
     rel="stylesheet">
 
   <!-- Stylesheet -->
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css">`r`n  <link rel="stylesheet" href="roles.css">
 </head>
 
 <body>
@@ -1129,18 +1129,7 @@
               </div>
             </div>
 
-            <section class="ai-analysis-card" aria-labelledby="screeningSourcesTitle" style="margin-top: 16px;">
-              <h4 id="screeningSourcesTitle">Tài liệu sàng lọc và theo dõi từ nguồn chính thức</h4>
-              <div id="screeningSuggestion" role="status" aria-live="polite"></div>
-              <p>Công cụ cần phù hợp với độ tuổi và được bác sĩ hướng dẫn. Sàng lọc không phải chẩn đoán; các liên kết mở tài liệu bên ngoài và không tự gửi kết quả cho bác sĩ.</p>
-              <ul style="padding-left: 20px; line-height: 1.8;">
-                <li><a href="https://www.mchatscreen.com/mchat-rf/translations/" target="_blank" rel="noopener noreferrer">M-CHAT-R/F: bản dịch tiếng Việt của tác giả</a> — sàng lọc tự kỷ cho trẻ 16–30 tháng.</li>
-                <li><a href="https://www.cdc.gov/act-early/resources/milestone-checklists.html" target="_blank" rel="noopener noreferrer">CDC: bảng theo dõi mốc phát triển tiếng Việt</a> — không thay thế sàng lọc chuyên môn.</li>
-                <li><a href="https://nichq.org/downloadable/nichq-vanderbilt-assessment-scales/" target="_blank" rel="noopener noreferrer">NICHQ Vanderbilt: biểu mẫu dành cho chuyên gia</a> — hỗ trợ đánh giá ADHD ở trẻ 6–12 tuổi.</li>
-              </ul>
-              <p>Trao đổi với bác sĩ về cách sử dụng và kết quả.</p>
-              <a href="#parentReferralPanel">Phụ huynh đăng nhập: làm bảng theo dõi 2 tuổi và gửi bác sĩ →</a>
-            </section>
+            
             <!-- Recommended Exercise List -->
             <div>
               <div class="recom-section-title">
@@ -2623,15 +2612,112 @@
     </div>
   </div>
 
+
+  <!-- Clinical Interactive Test Modal for 4 Branches -->
+  <div class="role-modal-overlay" id="clinicalAssessmentModal">
+    <div class="role-modal-box clinical-test-modal-box">
+      <div class="role-modal-header">
+        <div>
+          <span class="role-badge-pill" id="testModalBadge"
+            style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6; margin-bottom: 6px;">📋 Bài Test Sàng Lọc Chuẩn
+            Y Khoa</span>
+          <h3 id="testModalTitle">Lượng Giá Sàng Lọc Phổ Tự Kỷ (M-CHAT-R/F, CARS &amp; DSM-5)</h3>
+          <p id="testModalSubtitle">Dựa trên tài liệu y khoa chuẩn hóa • Đánh giá nguy cơ &amp; phát sóng đến chuyên gia
+          </p>
+        </div>
+        <button type="button" class="role-modal-close" id="btnCloseClinicalTestModal">&times;</button>
+      </div>
+
+      <!-- VIEW 1: LÀM BÀI TEST -->
+      <div id="clinicalTestFormView">
+        <!-- Patient Info Input Row -->
+        <div class="test-patient-info-grid">
+          <div class="test-patient-field">
+            <label>Họ và tên của bé *</label>
+            <input type="text" id="testChildName" placeholder="Ví dụ: Bé Bo (Lê Gia Bảo)" value="Bé Bo">
+          </div>
+          <div class="test-patient-field">
+            <label>Tháng tuổi của bé *</label>
+            <input type="text" id="testChildAge" placeholder="Ví dụ: 28 tháng" value="28 tháng">
+          </div>
+          <div class="test-patient-field">
+            <label>Họ tên cha / mẹ *</label>
+            <input type="text" id="testParentName" placeholder="Ví dụ: Chị Lan" value="Chị Lan">
+          </div>
+          <div class="test-patient-field">
+            <label>Số điện thoại nhận phản hồi bác sĩ *</label>
+            <input type="tel" id="testParentPhone" placeholder="Ví dụ: 0912 345 678" value="0912 345 678">
+          </div>
+        </div>
+
+        <!-- Questions List Container -->
+        <div class="test-questions-container" id="testQuestionsContainer">
+          <!-- Populated by JS based on branch -->
+        </div>
+
+        <!-- Live Score & Risk Status Bar -->
+        <div class="test-live-score-bar">
+          <div class="test-score-stat">
+            <span>Điểm nguy cơ: </span>
+            <strong id="testLiveScoreText">0/10</strong>
+          </div>
+          <div id="testRiskBadgeEl" class="test-risk-badge low">Nguy cơ thấp</div>
+          <div id="testScaleStandardNote" style="font-size: 0.74rem; color: #94a3b8; max-width: 320px;">
+            Được tính theo trọng số tài liệu y khoa chính thức.
+          </div>
+        </div>
+
+        <!-- Mandatory Disclaimer -->
+        <div class="ai-mandatory-disclaimer-badge">
+          ⚠️ chat box Ai chỉ là công cụ hỗ trợ và có thể mắc sai sót
+        </div>
+
+        <button type="button" class="btn-submit-clinical-test" id="btnSubmitClinicalTest">
+          <span>📤 Gửi Kết Quả Cho Bác Sĩ &amp; Phòng Khám Tiếp Nhận Ngay</span>
+        </button>
+      </div>
+
+      <!-- VIEW 2: KẾT QUẢ SÀNG LỌC & ĐIỀU HƯỚNG BÁC SĨ PHẢN HỒI SỚM NHẤT -->
+      <div id="clinicalTestResultView" style="display: none;">
+        <div id="testResultSummaryBox"
+          style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+          <!-- Result summary -->
+        </div>
+
+        <!-- FIRST-RESPONDER PINNED CARD (#1 TOP PRIORITY) -->
+        <div id="firstResponderPinnedContainer">
+          <!-- Rendered by JS: either waiting notice or pinned doctor's clinic -->
+        </div>
+
+        <!-- NEIGHBORING PARTNER CLINICS SECTION (STRICTLY FROM localStorage edutrace_partners_v1) -->
+        <div class="neighboring-clinics-section" id="neighboringClinicsContainer">
+          <!-- Rendered by JS: real partner clinics or 'Chưa có phòng khám lân cận nào được nạp vào hệ thống' -->
+        </div>
+
+        <!-- Mandatory Disclaimer -->
+        <div class="ai-mandatory-disclaimer-badge">
+          ⚠️ chat box Ai chỉ là công cụ hỗ trợ và có thể mắc sai sót
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+          <button type="button" class="btn btn-outline-light" id="btnRetakeTest">Làm Lại Bài Test</button>
+          <button type="button" class="btn btn-primary" id="btnDoneTestView" style="background: #2563eb;">Hoàn
+            Tất</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <!-- Specialized Clinical Knowledge Base & Google Gemini AI Service -->
   <script src="js/gemini-knowledge.js"></script>
   <script src="js/gemini-service.js"></script>
   <script src="script.js"></script>
   <script src="js/gemini-chatbot-ui.js"></script>
-  <script type="module" src="js/screening-suggestions-ui.js"></script>
+  
   <!-- Firebase integration: remains in demo mode until js/firebase-config.js is configured. -->
   <script type="module" src="js/firebase-integration.js"></script>
+  <script type="module" src="js/role-workspaces.js"></script>
   <!-- Floating Back to Top Button -->
   <button type="button" id="btnBackToTop" class="btn-back-to-top" title="Lên đầu trang" aria-label="Lên đầu trang">
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">

@@ -236,7 +236,7 @@ class EduTraceChatbotUI {
     const quickSetup = document.getElementById('btnChatQuickSetup');
     const headerStatus = document.getElementById('chatHeaderStatus');
     const isConfigured = window.geminiService?.isConfigured();
-    const model = window.geminiService?.getModel() || 'gemini-3.5-flash-lite';
+    const model = window.geminiService?.getModel() || 'gemini-1.5-flash';
 
     if (!notice || !badgeText) return;
 
@@ -356,9 +356,6 @@ class EduTraceChatbotUI {
       if (err.message === 'MISSING_API_KEY') {
         errorMsg = 'Ba mẹ chưa thiết lập Gemini API Key. Vui lòng bấm vào biểu tượng bánh răng ở góc trên để nhập key miễn phí từ Google AI Studio!';
       }
-      if (err.message === 'KNOWLEDGE_UNAVAILABLE') {
-        errorMsg = 'Chưa tải được tri thức mới từ Firebase. Vui lòng kiểm tra kết nối và thử lại; câu trả lời bên dưới chỉ dùng dữ liệu cục bộ.';
-      }
       this.appendMessage('bot', errorMsg);
 
       // Thử trả lời bằng Doctor Rules
@@ -372,9 +369,23 @@ class EduTraceChatbotUI {
 
   /**
    * Phản hồi bằng Doctor Rule Engine khi không có API Key
+   * Tuân thủ nghiêm ngặt: Lấy đủ thông tin xác định nhánh bệnh -> cho làm bài test tương ứng -> không tự suy luận -> đính kèm tuyên bố miễn trừ
    */
   generateDoctorKnowledgeFallbackReply(userText) {
-    const lower = userText.toLowerCase();
+    const lower = userText.toLowerCase().trim();
+    const MANDATORY_DISCLAIMER = 'chat box Ai chỉ là công cụ hỗ trợ và có thể mắc sai sót';
+
+    // 0. Kiểm tra nếu thông tin quá ngắn hoặc mơ hồ -> Yêu cầu phụ huynh bổ sung thông tin
+    if (lower.length < 8 || lower === 'alo' || lower === 'chào' || lower === 'xin chào' || lower === 'giúp tôi' || lower === 'con tôi bị sao') {
+      return `Chào ba mẹ! Để Trợ lý AI có thể xác định chính xác nhánh bệnh và **chọn đúng bài test sàng lọc chuẩn y khoa** (M-CHAT-R/F, CARS, Denver II, Vanderbilt ADHD hay Sensory Profile), ba mẹ vui lòng chia sẻ thêm:
+1. **Bé nhà mình hiện tại được bao nhiêu tháng/tuổi?**
+2. **Những biểu hiện cụ thể của con khiến ba mẹ lo lắng?** (Ví dụ: bé chưa nói, gọi không quay đầu, hay vỗ tay lắc lư, khó ngồi yên, hay rất sợ cắt móng tay/tiếng ồn...)
+3. **Các biểu hiện này xuất hiện từ khi nào?**
+
+Ba mẹ cứ chia sẻ thoải mái nhé, em sẽ lắng nghe và kích hoạt bài test chuẩn y khoa phù hợp cho con ngay!
+
+${MANDATORY_DISCLAIMER}`;
+    }
 
     // 1. Tìm kiếm địa chỉ trung tâm tại Cần Thơ
     if (lower.includes('địa chỉ') || lower.includes('trung tâm') || lower.includes('phòng khám') || lower.includes('cần thơ') || lower.includes('ninh kiều') || lower.includes('bác sĩ')) {
@@ -385,56 +396,76 @@ class EduTraceChatbotUI {
 4. **Trường Dạy Trẻ Khuyết Tật Tương Lai Cần Thơ** - Đường 30/4, P. Xuân Khánh (ĐT: 0292.383.2266): Cơ sở giáo dục đặc biệt uy tín.
 5. **Trung tâm Kỹ năng Rồng Việt Cần Thơ** - Đường Trần Văn Hoài (ĐT: 0292.373.9988): Chuyên can thiệp Tăng động giảm chú ý (ADHD).
 
-Ba mẹ có thể đưa bé đến khám sàng lọc trực tiếp tại các địa chỉ trên nhé!`;
+Ba mẹ có thể đưa bé đến khám sàng lọc trực tiếp tại các địa chỉ trên nhé!
+
+${MANDATORY_DISCLAIMER}`;
     }
 
-    // 2. Tự kỷ / Stimming / Lắc lư / Vỗ tay / Xúc giác Sensory
-    if (lower.includes('xúc giác') || lower.includes('sensory') || lower.includes('cắt móng') || lower.includes('gội đầu') || lower.includes('meltdown')) {
-      return `Dạ ba mẹ, trẻ nhạy cảm xúc giác quá mức (Tactile Defensiveness) thường rất khó chịu khi cắt móng tay, gội đầu, mặc vải thô hoặc đi chân trần trên cỏ.
+    // 2. NHÁNH RỐI LOẠN ĐIỀU HÒA CẢM GIÁC (Sensory Processing / SI)
+    if (lower.includes('xúc giác') || lower.includes('sensory') || lower.includes('cắt móng') || lower.includes('gội đầu') || lower.includes('quá tải âm thanh') || lower.includes('sợ tiếng ồn') || lower.includes('meltdown giác quan')) {
+      return `Dạ ba mẹ, qua thông tin ba mẹ chia sẻ, các biểu hiện của bé hướng đến **Nhánh Rối Loạn Điều Hòa Cảm Giác (Sensory Processing Disorder - SI)** như nhạy cảm xúc giác hoặc quá tải thính giác.
 
-Theo chỉ dẫn chuyên môn của **BS. CKI Lê Thanh Thảo (PK Nhi Đồng Ninh Kiều)**:
-- Hãy kích thích bằng áp lực sâu (ôm chặt, vuốt miết chậm) trước khi tiếp xúc nhẹ.
-- Ba mẹ hãy xem video hướng dẫn kỹ thuật massage tại [kn-video:dyn_kn_sensory_01] và tải cẩm nang điều hòa cảm giác tại nhà [kn-doc:dyn_kn_sensory_01] để thực hành từng bước cùng con nhé!`;
+Dựa trên tài liệu chuyên môn **Thang Đánh Giá Hồ Sơ Cảm Giác (Dunn Sensory Profile)** và phác đồ của **BS. CKI Lê Thanh Thảo (PK Nhi Đồng Ninh Kiều)**, em đề xuất ba mẹ thực hiện bài test sàng lọc chuẩn cảm giác dưới đây:
+
+[clinical-test:sensory]
+
+**Chỉ dẫn chăm sóc theo tài liệu y khoa:**
+- Áp dụng kích thích áp lực sâu (Deep Pressure) trước khi tiếp xúc chất liệu lạ.
+- Xem video hướng dẫn kỹ thuật massage tại [kn-video:dyn_kn_sensory_01] và tải cẩm nang điều hòa cảm giác [kn-doc:dyn_kn_sensory_01] để thực hành cùng con.
+- Sau khi ba mẹ làm xong bài test, hệ thống sẽ gửi kết quả đồng thời đến các bác sĩ và cơ sở chuyên khoa để phản hồi sớm nhất cho gia đình.
+
+${MANDATORY_DISCLAIMER}`;
     }
 
-    if (lower.includes('tự kỷ') || lower.includes('asd') || lower.includes('stimming') || lower.includes('vỗ tay') || lower.includes('lắc lư') || lower.includes('rập khuôn')) {
-      return `Dạ ba mẹ yên tâm, các hành vi như vỗ tay, lắc lư (Stimming) là phản xạ tự nhiên của trẻ có phổ Tự kỷ (ASD) nhằm tự điều hòa cảm giác khi hệ thần kinh bị kích thích hoặc căng thẳng.
+    // 3. NHÁNH RỐI LOẠN PHỔ TỰ KỶ (ASD / CARS / M-CHAT / ADOS-2)
+    if (lower.includes('tự kỷ') || lower.includes('asd') || lower.includes('stimming') || lower.includes('vỗ tay') || lower.includes('lắc lư') || lower.includes('rập khuôn') || lower.includes('gọi không quay đầu') || lower.includes('không nhìn mắt') || lower.includes('không chỉ tay') || lower.includes('kiễng chân')) {
+      return `Dạ ba mẹ yên tâm, qua mô tả về các dấu hiệu như giảm tương tác mắt, gọi ít quay đầu hoặc hành vi lặp lại (stimming), hệ thống xác định trường hợp của bé thuộc **Nhánh Nghi Ngờ Phổ Tự Kỷ (ASD)**.
 
-Theo phác đồ của **BS. CKI Lê Thanh Thảo** và các chuyên gia Cần Thơ, ba mẹ có thể áp dụng:
-- **Kỹ thuật Chiếc kén bình yên & Massage áp lực sâu [ex-asd-01]**: Giúp làm dịu hệ thần kinh và hạ nhiệt cơn bồn chồn.
-- **Lịch sinh hoạt bằng hình ảnh PECS [ex-asd-02]**: Giúp con định hình rõ việc cần làm, giảm lo âu.
-- Xem video massage điều hòa xúc giác chuyên sâu [kn-video:dyn_kn_sensory_01] và tải cẩm nang hướng dẫn [kn-doc:dyn_kn_sensory_01].
-- Tuyệt đối không quát mắng hay giật mạnh tay con khi con đang stimming, hãy nhẹ nhàng ôm giữ hoặc chuyển hướng con vào trò chơi đất nặn [ex-asd-03] nhé!`;
+Dựa trên các tài liệu y khoa chính thức: **Thang sàng lọc M-CHAT-R/F (16-30 tháng), Tiêu chuẩn chẩn đoán DSM-5, Thang CARS (Childhood Autism Rating Scale) và ADOS-2**, EduTrace AI kích hoạt bài test sàng lọc chuyên sâu dưới đây để lượng giá chính xác mức độ nguy cơ:
+
+[clinical-test:asd]
+
+**Khuyến nghị can thiệp dựa trên tài liệu:**
+- Áp dụng bài tập **Kỹ thuật Chiếc kén bình yên & Massage áp lực sâu [ex-asd-01]** và **Lịch sinh hoạt bằng hình ảnh PECS [ex-asd-02]**.
+- Xem video phát triển tương tác mắt [kn-video:dyn_kn_speech_02] và cẩm nang [kn-doc:dyn_kn_sensory_01].
+- Tuyệt đối không quát mắng khi con đang stimming, hãy bình tĩnh đồng hành cùng bé.
+- Ngay sau khi hoàn thành test, kết quả sẽ được gửi lên hệ thống đến tất cả bác sĩ chuyên khoa Nhi & GDĐB. Bác sĩ/phòng khám phản hồi sớm nhất sẽ được kết nối ưu tiên số 1 cho ba mẹ!
+
+${MANDATORY_DISCLAIMER}`;
     }
 
-    // 3. Tăng động / Giảm chú ý / ADHD / Không ngồi yên
-    if (lower.includes('tăng động') || lower.includes('chú ý') || lower.includes('adhd') || lower.includes('bồn chồn') || lower.includes('nghịch') || lower.includes('chạy nhảy')) {
-      return `Trẻ có biểu hiện tăng động giảm chú ý thường gặp khó khăn ở vùng não kiểm soát "phanh hãm" (ức chế xung động) và khả năng duy trì tập trung.
+    // 4. NHÁNH TĂNG ĐỘNG GIẢM CHÚ Ý (ADHD / Vanderbilt)
+    if (lower.includes('tăng động') || lower.includes('chú ý') || lower.includes('adhd') || lower.includes('bồn chồn') || lower.includes('nghịch') || lower.includes('chạy nhảy') || lower.includes('mất tập trung') || lower.includes('xung động') || lower.includes('không ngồi yên')) {
+      return `Chào ba mẹ, các biểu hiện bồn chồn, luôn chân luôn tay và khó duy trì tập trung của con thuộc **Nhánh Tăng Động Giảm Chú Ý (ADHD)**.
 
-EduTrace AI gợi ý ba mẹ các kỹ thuật can thiệp hành vi tại nhà:
-- **Trò chơi "Đèn Xanh – Đèn Đỏ" [ex-adhd-01]**: Rèn luyện khả năng dừng lại ngay khi có hiệu lệnh.
-- **Kỹ thuật Thở bóng bay xoa dịu [ex-adhd-02]**: Hít thở sâu cơ hoành giúp con tự làm dịu cơ thể khi bồn chồn.
-- **Chia nhỏ thời gian bằng Pomodoro nhí 3-5 phút [ex-adhd-03]**: Kèm đồng hồ cát thị giác để con nhìn thấy đích đến rõ ràng.`;
+Dựa trên tài liệu y khoa chuẩn quốc tế **Thang Đánh Giá Hành Vi Trẻ Em NICHQ Vanderbilt & Tiêu Chuẩn DSM-5 ADHD**, em kích hoạt bài test sàng lọc chuyên biệt cho nhánh ADHD:
+
+[clinical-test:adhd]
+
+**Gợi ý rèn luyện theo tài liệu y khoa:**
+- **Trò chơi "Đèn Xanh – Đèn Đỏ" [ex-adhd-01]**: Rèn luyện phanh hãm não bộ và khả năng ức chế hành vi bộc phát.
+- **Kỹ thuật Thở bóng bay xoa dịu [ex-adhd-02]**: Hít thở sâu cơ hoành giúp con giải tỏa bồn chồn.
+- **Chia nhỏ nhiệm vụ Pomodoro 3-5 phút [ex-adhd-03]** kết hợp đồng hồ cát trực quan.
+- Khi làm xong test, toàn bộ bác sĩ và phòng khám sẽ nhận thông báo đồng thời để tiếp nhận hỗ trợ gia đình sớm nhất!
+
+${MANDATORY_DISCLAIMER}`;
     }
 
-    // 4. Chậm nói / Giao tiếp mắt / Chỉ tay / Bật âm / Tạm dừng
-    if (lower.includes('giao tiếp mắt') || lower.includes('tạm dừng') || lower.includes('nhìn mắt') || lower.includes('bắt mắt')) {
-      return `Chào ba mẹ, giao tiếp mắt là nền tảng số một để trẻ học bắt chước khẩu hình và phát triển ngôn ngữ tự nhiên.
+    // 5. NHÁNH CHẬM PHÁT TRIỂN NGÔN NGỮ (Speech Delay / Denver II)
+    return `Chào ba mẹ! Dựa trên các thông tin ba mẹ chia sẻ về việc bé chậm nói, vốn từ ít hoặc chưa ghép câu, hệ thống xác định con thuộc **Nhánh Chậm Phát Triển Ngôn Ngữ & Giao Tiếp (Speech Delay)**.
 
-Theo **ThS. Nguyễn Mai Anh (Ánh Sao Ninh Kiều)**:
-- Phương pháp hiệu quả nhất là **Trò chơi Tạm dừng**: Tạm dừng trò chơi trẻ thích ở đoạn cao trào 3-5 giây và ngang tầm mắt. Ngay khi con nhìn mắt bạn, lập tức tiếp tục trò chơi!
-- Ba mẹ có thể xem video thực hành mẫu tại [kn-video:dyn_kn_speech_02] và tải giáo trình theo dõi [kn-doc:dyn_kn_speech_02] để luyện tập hàng ngày cùng bé nhé!`;
-    }
+Dựa trên tài liệu chuẩn y khoa **Mốc Phát Triển Ngôn Ngữ & Vận Động Denver II (18 – 36 tháng)**, em kích hoạt bài test sàng lọc ngôn ngữ tương ứng để lượng giá vốn từ và khả năng hiểu ngôn ngữ của bé:
 
-    return `Chào ba mẹ, ở độ tuổi mầm non, việc con chậm nói hoặc chưa giao tiếp mắt thường là chỉ dấu cần can thiệp sớm ngay trong giai đoạn vàng (1.5 – 5 tuổi).
+[clinical-test:speech]
 
-Theo thang **M-CHAT-R/F** và giáo trình của **Trung tâm Can thiệp Sớm Ánh Sao Ninh Kiều**, ba mẹ nên áp dụng các bài tập tương tác tại nhà:
-- **Kỹ thuật Thổi bong bóng xà phòng & Bật âm [ex-speech-01]**: Ngồi đối diện mắt ngang tầm với con để con quan sát khẩu hình miệng của mẹ.
-- **Trò chơi Ú òa qua gương cảm xúc [ex-speech-02]**: Kích thích phản xạ quay đầu và tương tác ánh mắt tự nhiên.
-- **Dạy chỉ tay bằng Thẻ tranh PECS [ex-speech-03]**: Dạy con đưa hoặc chỉ thẻ tranh thay vì kéo tay người lớn.
-- Ba mẹ cũng có thể tham khảo video phát triển tương tác mắt [kn-video:dyn_kn_speech_02] và tải tài liệu hướng dẫn [kn-doc:dyn_kn_speech_02].
+**Bài tập can thiệp sớm tại nhà theo giáo trình:**
+- **Thổi bong bóng xà phòng & Kích thích Bật âm đơn [ex-speech-01]**: Ngồi đối diện ngang tầm mắt để con quan sát khẩu hình miệng.
+- **Trò chơi Ú òa qua gương cảm xúc [ex-speech-02]**: Kích thích tương tác ánh mắt và phản xạ gọi tên.
+- **Dạy chỉ tay bằng Thẻ tranh PECS [ex-speech-03]**: Giúp con trao đổi nhu cầu thay vì khóc hoặc kéo tay mẹ.
+- Ba mẹ có thể xem thêm video phát triển tương tác mắt tại [kn-video:dyn_kn_speech_02].
+- Ngay sau khi ba mẹ nộp kết quả test, tất cả bác sĩ và phòng khám đối tác sẽ nhận được thông báo để phản hồi tư vấn cho con sớm nhất!
 
-*(Mẹo: Bạn có thể nhập Gemini API Key để trò chuyện trực tiếp không giới hạn với trí tuệ nhân tạo Gemini 1.5 Flash nhé!)*`;
+${MANDATORY_DISCLAIMER}`;
   }
 
   showTypingIndicator() {
@@ -494,6 +525,17 @@ Theo thang **M-CHAT-R/F** và giáo trình của **Trung tâm Can thiệp Sớm 
     if (!text) return '';
 
     let processed = text;
+
+    // 0. Nhận diện mã bài test chuẩn y khoa [clinical-test:BRANCH]
+    const clinicalTestRegex = /\[clinical-test:(asd|speech|adhd|sensory)\]/gi;
+    let testBranchMatch = null;
+    let tMatch;
+    while ((tMatch = clinicalTestRegex.exec(text)) !== null) {
+      testBranchMatch = tMatch[1];
+    }
+
+    // Xóa mã [clinical-test:...] khỏi văn bản chính
+    processed = processed.replace(/\[clinical-test:(asd|speech|adhd|sensory)\]/gi, '');
 
     // 1. Phát hiện các mã bài tập [ex-speech-01], [ex-asd-01], v.v.
     const exerciseRegex = /\[(ex-[a-z0-9-]+)\]/gi;
@@ -626,6 +668,66 @@ Theo thang **M-CHAT-R/F** và giáo trình của **Trung tâm Can thiệp Sớm 
       if (cardsHtml) {
         processed += `<div class="chat-embedded-exercises-wrap"><div class="embed-title-label">🎯 Bài tập đề xuất cho bạn:</div>${cardsHtml}</div>`;
       }
+    }
+
+    // Render Thẻ Bài Test Sàng Lọc Chuẩn Y Khoa Tương Ứng (Bệnh gì thì cho bài test đó)
+    if (testBranchMatch) {
+      let testMeta = {
+        title: 'Thang Sàng Lọc Phổ Tự Kỷ M-CHAT-R/F, CARS & DSM-5',
+        standards: 'Chuẩn Bộ Y Tế & Quốc tế (16 - 36 tháng)',
+        color: '#8b5cf6',
+        icon: '🧩'
+      };
+      if (testBranchMatch === 'speech') {
+        testMeta = {
+          title: 'Thang Đánh Giá Mốc Phát Triển Ngôn Ngữ Denver II',
+          standards: 'Mốc ngôn ngữ & vận động âm ngữ (18 - 36 tháng)',
+          color: '#0284c7',
+          icon: '🗣️'
+        };
+      } else if (testBranchMatch === 'adhd') {
+        testMeta = {
+          title: 'Thang Đánh Giá Hành Vi NICHQ Vanderbilt & DSM-5 ADHD',
+          standards: 'Giảm chú ý, tăng động & kiểm soát xung động',
+          color: '#ea580c',
+          icon: '⚡'
+        };
+      } else if (testBranchMatch === 'sensory') {
+        testMeta = {
+          title: 'Hồ Sơ Điều Hòa Giác Quan Dunn Sensory Profile',
+          standards: 'Xúc giác, thính giác, tiền đình & bản thể',
+          color: '#059669',
+          icon: '💆'
+        };
+      }
+
+      processed += `
+        <div class="chat-embed-test-card" onclick="window.openClinicalTestModal('${testBranchMatch}')" style="border-left-color: ${testMeta.color};">
+          <div class="test-card-icon" style="background: ${testMeta.color}15; color: ${testMeta.color};">${testMeta.icon}</div>
+          <div class="test-card-body">
+            <div class="test-card-badge" style="color: ${testMeta.color}; background: ${testMeta.color}15;">📋 BÀI TEST CHUẨN Y KHOA ĐƯỢC CHỌN</div>
+            <div class="test-card-title">${testMeta.title}</div>
+            <div class="test-card-meta">${testMeta.standards}</div>
+            <div class="test-card-hint">Sau khi làm xong, hệ thống gửi kết quả đồng thời đến các bác sĩ &amp; phòng khám để nhận phản hồi sớm nhất!</div>
+          </div>
+          <button type="button" class="test-card-btn" style="background: ${testMeta.color};">
+            Làm Test Ngay ➔
+          </button>
+        </div>
+      `;
+    }
+
+    // Luôn định dạng hoặc bổ sung dòng tuyên bố miễn trừ bắt buộc
+    const disclaimerText = 'chat box Ai chỉ là công cụ hỗ trợ và có thể mắc sai sót';
+    const hasDisclaimer = processed.toLowerCase().includes('chat box ai chỉ là công cụ hỗ trợ');
+    if (!hasDisclaimer) {
+      processed += `<div class="ai-mandatory-disclaimer-badge">⚠️ ${disclaimerText}</div>`;
+    } else {
+      // Bọc dòng chữ đã có vào badge đẹp
+      processed = processed.replace(
+        new RegExp(disclaimerText, 'gi'),
+        `<span class="ai-mandatory-disclaimer-badge">⚠️ ${disclaimerText}</span>`
+      );
     }
 
     return processed;

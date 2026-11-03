@@ -3,18 +3,1424 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Không gian làm việc | EduTrace AI</title>
+  <title>Cổng Chuyên Môn &amp; Quản Lý Lâm Sàng | EduTrace AI</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="roles.css">
   <style>
-    .workspace-header { background:#10203b; color:white; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:18px max(24px,calc((100% - 1200px)/2)); }
-    .workspace-header strong { font-size:1.2rem; } .workspace-header button { border:1px solid #88a6b8; border-radius:8px; color:white; background:transparent; padding:9px 14px; cursor:pointer; }
-    #workspaceStatus { max-width:1200px; margin:20px auto; padding:0 24px; }
+    .workspace-top-bar {
+      background: linear-gradient(90deg, #0f172a 0%, #1e293b 100%);
+      color: #fff;
+      padding: 12px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .workspace-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: #fff;
+    }
+    .workspace-brand strong {
+      font-size: 1.15rem;
+      letter-spacing: -0.01em;
+    }
+    .workspace-brand-badge {
+      background: rgba(56, 189, 248, 0.15);
+      color: #38bdf8;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      padding: 2px 10px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .workspace-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn-ws-nav {
+      background: transparent;
+      border: 1px solid #475569;
+      color: #cbd5e1;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+    .btn-ws-nav:hover {
+      background: #1e293b;
+      color: #fff;
+      border-color: #94a3b8;
+    }
+    .btn-ws-home-btn {
+      background: #2563eb !important;
+      color: #ffffff !important;
+      border: 1px solid #3b82f6 !important;
+      font-weight: 700 !important;
+    }
+    .btn-ws-home-btn:hover {
+      background: #1d4ed8 !important;
+    }
+    .btn-ws-logout {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      color: #fca5a5;
+    }
+    .btn-ws-logout:hover {
+      background: #dc2626;
+      color: #fff;
+      border-color: #dc2626;
+    }
+    #workspaceStatus {
+      max-width: 1200px;
+      margin: 10px auto;
+      padding: 0 24px;
+      font-size: 0.85rem;
+      color: #64748b;
+    }
+    .btn-ws-backhome {
+      background: #2563eb !important;
+      color: #ffffff !important;
+      border: 1px solid #3b82f6 !important;
+      font-weight: 700 !important;
+      padding: 7px 16px !important;
+      border-radius: 8px !important;
+      font-size: 0.85rem !important;
+      text-decoration: none !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 7px !important;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35) !important;
+      transition: all 0.2s ease !important;
+    }
+    .btn-ws-backhome:hover {
+      background: #1d4ed8 !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.45) !important;
+    }
   </style>
 </head>
-<body>
-  <header class="workspace-header"><strong>EduTrace AI · Không gian làm việc</strong><button type="button" id="workspaceLogout">Đăng xuất</button></header>
-  <p id="workspaceStatus" role="status">Đang kiểm tra tài khoản...</p>
-  <main id="workspaceRoot"></main>
+<body class="workspace-page-body">
+  <!-- Thanh công cụ chuyên môn duy nhất, liền mạch không bị tách đoạn -->
+  <header class="workspace-top-bar" id="roleIndicatorBar">
+    <div class="container role-indicator-inner" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; width: 100%; max-width: 1240px; margin: 0 auto; padding: 0;">
+      <!-- Khối trái: Logo thương hiệu + Phân cách + Badge vai trò & Tiêu đề -->
+      <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+        <span class="workspace-brand" style="cursor: default; display: inline-flex; align-items: center; gap: 8px;">
+          <span style="font-size: 1.35rem;">🏥</span>
+          <strong style="color: #ffffff; font-size: 1.15rem; font-weight: 800; letter-spacing: -0.01em;">EduTrace AI</strong>
+          <span class="workspace-brand-badge" style="display: none;">Portal</span>
+        </span>
+        <span style="display: inline-block; width: 1px; height: 22px; background: rgba(255, 255, 255, 0.2);"></span>
+        <div class="role-indicator-info" style="display: flex; align-items: center; gap: 8px;">
+          <span class="role-badge-pill doctor" id="roleBadgePill">🩺 Bác Sĩ / Chuyên Viên</span>
+          <span class="role-indicator-title" id="roleIndicatorTitle" style="font-size: 0.86rem; color: #cbd5e1; font-weight: 500;">
+            Không gian làm việc chuyên môn
+          </span>
+        </div>
+      </div>
+
+      <!-- Khối phải: Lời chào + Link Admin + Nút Đăng Xuất -->
+      <div class="workspace-actions">
+        <span id="workspaceUserGreeting" style="font-size: 0.82rem; color: #94a3b8; margin-right: 6px;"></span>
+        <a href="admin.html" class="btn-ws-nav" id="workspaceAdminLink" style="display: none;">⚙️ Trang Quản Trị</a>
+        <button type="button" id="workspaceLogout" class="btn-ws-nav btn-ws-logout">Đăng Xuất</button>
+      </div>
+    </div>
+  </header>
+
+  <p id="workspaceStatus" role="status" style="display: none;"></p>
+
+  <div id="doctorRoleWorkspace" class="role-workspace" style="display: none;">
+    <div class="container">
+      <!-- Doctor Profile & Clinical Overview -->
+      <div class="role-workspace-header" id="doctorOverviewSection">
+        <div class="role-profile-meta">
+          <div class="role-profile-avatar doctor">🩺</div>
+          <div class="role-profile-text">
+            <h2>
+              ThS. Nguyễn Mai Anh
+              <span class="role-badge-pill doctor" style="font-size: 0.72rem;">Bác Sĩ / Chuyên Viên</span>
+            </h2>
+            <p>Chuyên gia Giáo dục Đặc biệt • Trị liệu Ngôn ngữ &amp; Can thiệp Sớm Trẻ Tự kỷ (ASD), Tăng động (ADHD)
+            </p>
+            <div class="role-profile-tags">
+              <span class="role-mini-tag"><span class="role-status-dot"></span> Sẵn sàng nhận ca đánh giá</span>
+              <span class="role-mini-tag">🏥 Bệnh Viện Nhi Đồng &amp; Đối tác Cần Thơ</span>
+              <span class="role-mini-tag">📜 Chứng chỉ BCBA / ThS. Tâm lý học lâm sàng</span>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <button type="button" class="btn btn-primary" id="btnDoctorQuickEval"
+            onclick="document.querySelector('#doctorTabsBar .role-tab-btn[data-tab=\'doctorTabCases\']')?.click()"
+            style="background: #059669; padding: 10px 18px;">
+            ➕ Đánh Giá Ca Mới
+          </button>
+        </div>
+      </div>
+
+      <!-- Doctor Broadcast Notification Banner -->
+      <div id="doctorBroadcastAlert" class="broadcast-alert-banner" style="display: none;">
+        <div class="broadcast-alert-content">
+          <span class="bell-icon">🔔</span>
+          <div>
+            <strong id="doctorBroadcastTitle">CÓ CA TEST SÀNG LỌC MỚI TỪ PHỤ HUYNH!</strong>
+            <div id="doctorBroadcastDesc" style="font-size: 0.8rem; opacity: 0.95;">Bé ... vừa hoàn thành test. Nhận ca
+              ngay để được điều hướng bệnh nhân về cơ sở!</div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-light" id="btnDoctorViewBroadcast"
+          style="font-weight: 800; color: #c2410c; background: #ffffff; padding: 6px 14px; border-radius: 8px;">
+          Xem &amp; Tiếp Nhận Ca ➔
+        </button>
+      </div>
+
+      <!-- Doctor Stats KPI -->
+      <div class="role-stats-grid">
+        <div class="role-stat-card">
+          <div class="role-stat-info">
+            <span>Ca Can Thiệp Theo Dõi</span>
+            <h3>12 Ca</h3>
+            <p>4 ca ASD, 4 ca Chậm nói, 4 ca ADHD</p>
+          </div>
+          <div class="role-stat-icon emerald">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+        </div>
+
+        <div class="role-stat-card">
+          <div class="role-stat-info">
+            <span>Lịch Đánh Giá Hôm Nay</span>
+            <h3 style="color: #2563eb;">3 Lịch</h3>
+            <p>09:00 (Bé Bo), 14:30 (Bé Ken), 16:00 (Bé Minh)</p>
+          </div>
+          <div class="role-stat-icon blue">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+            </svg>
+          </div>
+        </div>
+
+        <div class="role-stat-card">
+          <div class="role-stat-info">
+            <span>Đơn Bài Tập Đã Kê</span>
+            <h3 style="color: #d97706;">18 Đơn</h3>
+            <p>Hướng dẫn phụ huynh rèn luyện 3-5m</p>
+          </div>
+          <div class="role-stat-icon amber">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2">
+              </polygon>
+            </svg>
+          </div>
+        </div>
+
+        <div class="role-stat-card">
+          <div class="role-stat-info">
+            <span>Yêu Cầu Hội Chẩn</span>
+            <h3 style="color: #9333ea;">4 Yêu cầu</h3>
+            <p>Từ trung tâm can thiệp vệ tinh Ninh Kiều</p>
+          </div>
+          <div class="role-stat-icon purple">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Doctor Tabs Bar -->
+      <div class="role-tabs-bar" id="doctorTabsBar">
+        <button type="button" class="role-tab-btn active doctor" data-tab="doctorTabTestQueue"
+          id="doctorTabTestQueueBtn">
+          ⚡ Hàng Đợi Ca Test Mới (First-Responder) <span id="doctorPendingTestCount"
+            style="display: none; background: #ea580c; color: #fff; padding: 2px 7px; border-radius: 99px; font-size: 0.72rem; margin-left: 4px;">0</span>
+        </button>
+        <button type="button" class="role-tab-btn doctor" data-tab="doctorTabCases">
+          📋 Hồ Sơ Ca Can Thiệp &amp; Đánh Giá
+        </button>
+        <button type="button" class="role-tab-btn doctor" data-tab="doctorTabPrescriptions">
+          🎯 Kê Đơn Bài Tập Về Nhà
+        </button>
+        <button type="button" class="role-tab-btn doctor" data-tab="doctorTabScales">
+          📖 Thang Đo M-CHAT-R &amp; Phác Đồ Y Khoa
+        </button>
+        <button type="button" class="role-tab-btn doctor" data-tab="doctorTabAI">
+          🤖 AI Trợ Lý Lâm Sàng Chuyên Gia
+        </button>
+      </div>
+
+      <!-- Tab 0: First-Responder Test Queue (Simultaneous Broadcast) -->
+      <div id="doctorTabTestQueue" class="doctor-tab-panel" style="display: block;">
+        <div class="role-card">
+          <div class="role-card-header">
+            <div>
+              <h3>⚡ Hàng Đợi Ca Test Sàng Lọc Phát Sóng Đồng Thời (Broadcast Queue)</h3>
+              <p>Mọi ca test từ phụ huynh được gửi đồng thời đến tất cả bác sĩ &amp; phòng khám. Ai nhận bệnh và phản
+                hồi sớm nhất sẽ được ghim điều hướng bệnh nhân đến phòng khám đó!</p>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-light" onclick="window.refreshClinicalTestQueues?.()">
+              🔄 Làm Mới Hàng Đợi
+            </button>
+          </div>
+          <div id="doctorTestQueueContainer"
+            style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 1: Cases Table -->
+      <div id="doctorTabCases" class="doctor-tab-panel">
+        <div class="role-card" id="doctorCasesSection">
+          <div class="role-card-header">
+            <div>
+              <h3>Danh Sách Hồ Sơ Ca Can Thiệp Phân Công Cho Bác Sĩ</h3>
+              <p>Theo dõi quá trình tiến bộ của trẻ, nhập nhận xét lâm sàng và chỉ định phác đồ can thiệp sớm</p>
+            </div>
+            <div class="role-filter-row">
+              <div class="role-search-box">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="11" cy="11" r="8"></circle>
+                  <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="doctorCaseSearch" placeholder="Tìm theo tên bé, phụ huynh, SĐT...">
+              </div>
+              <select id="doctorSyndromeFilter" class="role-select">
+                <option value="all">Tất cả hội chứng</option>
+                <option value="speech">Trẻ chậm nói</option>
+                <option value="asd">Tự kỷ (ASD)</option>
+                <option value="adhd">Tăng động (ADHD)</option>
+                <option value="sensory">Rối loạn cảm giác (SI)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="role-table-wrap">
+            <table class="role-table">
+              <thead>
+                <tr>
+                  <th>Bệnh Nhi &amp; Độ Tuổi</th>
+                  <th>Phụ Huynh Liên Hệ</th>
+                  <th>Phân Loại Hội Chứng</th>
+                  <th>Mức Độ Can Thiệp</th>
+                  <th>Mục Tiêu Ưu Tiên</th>
+                  <th style="text-align: right;">Thao Tác Bác Sĩ</th>
+                </tr>
+              </thead>
+              <tbody id="doctorCasesTableBody">
+                <!-- Populated by js/role-workspaces.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Prescriptions -->
+      <div id="doctorTabPrescriptions" class="doctor-tab-panel" style="display: none;">
+        <div class="role-card" id="doctorPrescriptionsSection">
+          <div class="role-card-header">
+            <div>
+              <h3>Đơn Bài Tập Can Thiệp Đã Chỉ Định Cho Phụ Huynh Về Nhà</h3>
+              <p>Dựa trên kho bài tập video 3-5 phút chuẩn hóa của EduTrace AI, giao bài tập cá nhân hóa cho phụ huynh
+              </p>
+            </div>
+            <button type="button" class="btn btn-primary"
+              style="background: #059669; font-size: 0.82rem; padding: 8px 16px;"
+              onclick="openPrescribeModal('case-01')">
+              ➕ Kê Đơn Mới
+            </button>
+          </div>
+          <div id="doctorPrescriptionsList">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Medical Scales (M-CHAT-R/F Interactive Screener) -->
+      <div id="doctorTabScales" class="doctor-tab-panel" style="display: none;">
+        <div class="role-card" id="doctorScalesSection">
+          <div class="role-card-header">
+            <div>
+              <h3>Công Cụ Sàng Lọc Nguy Cơ Tự Kỷ M-CHAT-R/F (20 Tiêu Chí Chuẩn Y Khoa)</h3>
+              <p>Bác sĩ hoặc chuyên gia thực hiện cùng cha mẹ để tính điểm phân tầng nguy cơ tức thì</p>
+            </div>
+            <button type="button" class="btn btn-outline-light" id="btnResetMChat"
+              style="font-size: 0.8rem; padding: 6px 12px;">
+              🔄 Làm Lại Bài Test
+            </button>
+          </div>
+
+          <div class="mchat-container">
+            <div class="mchat-header">
+              <div class="mchat-score-box">
+                <div>
+                  <span style="font-size: 0.72rem; color: #64748b; font-weight: 700; text-transform: uppercase;">Điểm
+                    Nguy Cơ M-CHAT:</span>
+                  <div class="mchat-score-val" id="mchatScoreValue">0/20</div>
+                </div>
+                <div>
+                  <span class="mchat-risk-pill low" id="mchatRiskBadge">Nguy Cơ Thấp (0 - 2)</span>
+                </div>
+              </div>
+              <div style="flex: 1; max-width: 500px; font-size: 0.82rem; color: #475569;" id="mchatAdviceText">
+                Trẻ phát triển trong giới hạn bình thường. Tiếp tục theo dõi các mốc phát triển tự nhiên tại nhà.
+              </div>
+            </div>
+
+            <div class="mchat-questions-grid" id="mchatQuestionsGrid">
+              <!-- 20 standard questions populated via JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Reference Tables: DSM-5 & Denver II -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 18px;">
+          <div class="role-card">
+            <h3 style="font-size: 1.05rem; margin-bottom: 12px; color: #0f172a;">Tiêu Chuẩn Chẩn Đoán DSM-5 (Tự Kỷ -
+              ASD)</h3>
+            <div style="font-size: 0.82rem; color: #334155; line-height: 1.6;">
+              <p><strong>Tiêu chí A: Khiếm khuyết giao tiếp &amp; tương tác xã hội (Cần đủ 3/3):</strong><br>
+                A1. Thiếu hụt tương hỗ cảm xúc - xã hội (ít chia sẻ cảm xúc, không bắt đầu hội thoại).<br>
+                A2. Thiếu hụt hành vi giao tiếp phi ngôn ngữ (ít nhìn mắt, nét mặt đơ cứng).<br>
+                A3. Khó khăn phát triển, duy trì và hiểu các mối quan hệ bạn bè.</p>
+              <p><strong>Tiêu chí B: Hành vi, sở thích rập khuôn, định hình (Tối thiểu 2/4):</strong><br>
+                B1. Vận động định hình (vẫy tay, xoay đồ chơi, lắc lư).<br>
+                B2. Tuân thủ cứng nhắc các lịch trình quen thuộc (thay đổi là bùng nổ).<br>
+                B3. Sở thích bị thu hẹp cao độ với cường độ bất thường.<br>
+                B4. Tăng hoặc giảm phản ứng với cảm giác (sợ âm thanh, thích ngửi/sờ vật lạ).</p>
+            </div>
+          </div>
+
+          <div class="role-card">
+            <h3 style="font-size: 1.05rem; margin-bottom: 12px; color: #0f172a;">Mốc Phát Triển Denver II (1.5 - 5 Tuổi)
+            </h3>
+            <div style="font-size: 0.82rem; color: #334155; line-height: 1.6;">
+              <p><strong>18 Tháng:</strong> Nói được 6-10 từ đơn; tự xúc thìa; biết chỉ tay khi muốn lấy đồ vật; biết
+                bắt chước việc nhà đơn giản.</p>
+              <p><strong>24 Tháng:</strong> Nói câu 2 từ ghép ("mẹ bế", "uống sữa"); biết chỉ 4 bộ phận cơ thể; chạy
+                vững; xếp tháp 4-6 khối gỗ.</p>
+              <p><strong>36 Tháng:</strong> Nói câu 3-4 từ; phân biệt giới tính; biết đi xe đạp 3 bánh; biết tự rửa tay.
+              </p>
+              <p><strong>48 Tháng:</strong> Kể lại câu chuyện ngắn; biết nhảy 1 chân; tự mặc quần áo có sự hỗ trợ nhỏ.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 4: Clinical AI Co-pilot -->
+      <div id="doctorTabAI" class="doctor-tab-panel" style="display: none;">
+        <div class="role-card" id="doctorAISection">
+          <div class="role-card-header">
+            <div>
+              <h3>Trợ Lý AI Hỗ Trợ Chẩn Đoán &amp; Kế Hoạch Giáo Dục Cá Nhân (IEP)</h3>
+              <p>Tối ưu hóa phác đồ can thiệp lâm sàng dựa trên cơ sở tri thức y khoa được nạp sẵn</p>
+            </div>
+            <span class="role-badge-pill doctor">Clinical AI Mode</span>
+          </div>
+
+          <div class="doctor-ai-panel">
+            <div class="doctor-ai-sidebar">
+              <h4>Gợi Ý Lệnh Nhanh Cho Bác Sĩ:</h4>
+              <button type="button" class="doctor-ai-prompt-chip"
+                data-prompt="Soạn mục tiêu kế hoạch giáo dục cá nhân IEP 3 tháng cho bé chậm nói 2.5 tuổi">
+                📋 Soạn mục tiêu IEP 3 tháng (Chậm nói)
+              </button>
+              <button type="button" class="doctor-ai-prompt-chip"
+                data-prompt="Chiến lược điều chỉnh hành vi bùng nổ (Meltdown) theo nguyên tắc ABC của ABA">
+                ⚡ Chiến lược giảm bùng nổ theo ABA
+              </button>
+              <button type="button" class="doctor-ai-prompt-chip"
+                data-prompt="Phác đồ điều hòa cảm giác xúc giác (Tactile Sensory Diet) cho bé sợ cát">
+                🎨 Phác đồ Sensory xúc giác
+              </button>
+              <button type="button" class="doctor-ai-prompt-chip"
+                data-prompt="Phân biệt chậm phát triển ngôn ngữ đơn thuần và rối loạn phổ tự kỷ">
+                🩺 Phân biệt Chậm nói vs Tự kỷ ASD
+              </button>
+            </div>
+
+            <div class="doctor-ai-chat-window">
+              <div class="doctor-ai-chat-messages" id="doctorAIMessages">
+                <div class="doctor-ai-msg ai">
+                  <strong>Xin chào ThS. Mai Anh,</strong><br>
+                  Tôi là Trợ lý AI Chuyên gia Giáo dục Đặc biệt trên nền tảng EduTrace AI. Tôi đã được nạp cơ sở tri
+                  thức chuẩn gồm M-CHAT-R/F, DSM-5, Denver II, ABA, TEACCH và Sensory Integration. Bác sĩ có thể yêu cầu
+                  soạn thảo mục tiêu IEP, đề xuất phác đồ điều chỉnh hành vi hoặc tra cứu chẩn đoán phân biệt.
+                </div>
+              </div>
+
+              <div class="doctor-ai-input-bar">
+                <input type="text" id="doctorAIInput"
+                  placeholder="Nhập câu hỏi lâm sàng hoặc yêu cầu soạn kế hoạch IEP...">
+                <button type="button" class="btn btn-primary" id="btnDoctorAISend"
+                  style="background: #059669; padding: 8px 16px;">
+                  Gửi AI
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       CONTAINER 3: PHÒNG KHÁM & TRUNG TÂM WORKSPACE
+       Giao diện điều phối tiếp nhận dành riêng cho Trung tâm can thiệp & Trường hòa nhập
+       ========================================================================== -->
+  <div id="clinicRoleWorkspace" class="role-workspace" style="display: none;">
+    <div class="container">
+      <!-- Clinic Profile & Reception Overview -->
+      <div class="role-workspace-header" id="clinicOverviewSection">
+        <div class="role-profile-meta">
+          <div class="role-profile-avatar clinic">🏥</div>
+          <div class="role-profile-text">
+            <h2>
+              Trung Tâm Can Thiệp Sớm Ánh Sao Ninh Kiều
+              <span class="role-badge-pill center" style="font-size: 0.72rem;">Phòng Khám / Cơ Sở Can Thiệp</span>
+            </h2>
+            <p>Đường Nguyễn Văn Cừ nối dài, P. An Bình, Q. Ninh Kiều, TP. Cần Thơ • Hotline: 0912 888 999</p>
+            <div class="role-profile-tags">
+              <span class="role-mini-tag"><span class="role-status-dot"></span> Đang mở cửa tiếp nhận trẻ (07:30 -
+                17:30)</span>
+              <span class="role-mini-tag">📜 GP số 108/GP-GDĐB-CT</span>
+              <span class="role-mini-tag">👩‍🏫 8 Chuyên gia &amp; Giáo viên trực thuộc</span>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <button type="button" class="btn btn-primary" id="btnClinicAddStudent"
+            onclick="document.getElementById('addStudentModal').classList.add('active')"
+            style="background: #0284c7; padding: 10px 18px;">
+            ➕ Tiếp Nhận Học Viên Mới
+          </button>
+        </div>
+      </div>
+
+      <!-- Clinic Broadcast Notification Banner -->
+      <div id="clinicBroadcastAlert" class="broadcast-alert-banner" style="display: none;">
+        <div class="broadcast-alert-content">
+          <span class="bell-icon">🔔</span>
+          <div>
+            <strong id="clinicBroadcastTitle">CÓ CA TEST SÀNG LỌC MỚI TỪ PHỤ HUYNH!</strong>
+            <div id="clinicBroadcastDesc" style="font-size: 0.8rem; opacity: 0.95;">Bé ... vừa nộp kết quả test. Nhận ca
+              ngay để bệnh nhân được điều hướng đến cơ sở bạn!</div>
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-light" id="btnClinicViewBroadcast"
+          style="font-weight: 800; color: #c2410c; background: #ffffff; padding: 6px 14px; border-radius: 8px;">
+          Xem &amp; Tiếp Nhận Ca ➔
+        </button>
+      </div>
+
+      <!-- Clinic Stats KPI -->
+      <div class="role-stats-grid">
+        <div class="role-stat-card">
+          <div class="role-stat-info">
+            <span>Đơn Hẹn Mới Tiếp Nhận</span>
+            <h3 style="color: #0284c7;">5 Đơn</h3>
+            <p>Từ phễu Trợ lý AI và bài tập 3-5m</p>
+          </div>
+          <div class="role-stat-icon blue">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+              <polyline points="22,6 12,13 2,6"></polyline>
+            </svg>
+          </div>
+        </div>
+
+        <div class="role-stat-card">
+          <div class="role-stat-info">
+            <span>Trẻ Đang Can Thiệp Tại Cơ Sở</span>
+            <h3 style="color: #059669;">24 Bé</h3>
+            <p>14 ca 1-1, 10 bé bán trú hòa nhập</p>
+          </div>
+          <div class="role-stat-icon emerald">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+            </svg>
+          </div>
+        </div>
+
+        <div class="role-stat-card">
+          <div class="role-stat-info">
+            <span>Chuyên Viên Đang Trực</span>
+            <h3 style="color: #7c3aed;">8 Nhân sự</h3>
+            <p>Âm ngữ, Cảm giác, Hành vi, Giáo viên mầm non</p>
+          </div>
+          <div class="role-stat-icon purple">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+            </svg>
+          </div>
+        </div>
+
+        <div class="role-stat-card">
+          <div class="role-stat-info">
+            <span>Tỷ Lệ Đến Khám Đúng Hẹn</span>
+            <h3 style="color: #d97706;">92%</h3>
+            <p>Được trợ lý tự động gửi nhắc hẹn SMS/Zalo</p>
+          </div>
+          <div class="role-stat-icon amber">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Clinic Tabs Bar -->
+      <div class="role-tabs-bar" id="clinicTabsBar">
+        <button type="button" class="role-tab-btn active clinic" data-tab="clinicTabTestQueue"
+          id="clinicTabTestQueueBtn">
+          ⚡ Hàng Đợi Ca Test Mới (First-Responder) <span id="clinicPendingTestCount"
+            style="display: none; background: #ea580c; color: #fff; padding: 2px 7px; border-radius: 99px; font-size: 0.72rem; margin-left: 4px;">0</span>
+        </button>
+        <button type="button" class="role-tab-btn clinic" data-tab="clinicTabBookings">
+          📅 Tiếp Nhận &amp; Điều Phối Lịch Hẹn 1-1
+        </button>
+        <button type="button" class="role-tab-btn clinic" data-tab="clinicTabStudents">
+          👶 Quản Lý Học Viên / Bệnh Nhi Can Thiệp
+        </button>
+        <button type="button" class="role-tab-btn clinic" data-tab="clinicTabProfile">
+          🏢 Hồ Sơ Cơ Sở &amp; Dịch Vụ Can Thiệp
+        </button>
+        <button type="button" class="role-tab-btn clinic" data-tab="clinicTabAnalytics">
+          📊 Báo Cáo Hiệu Quả Phễu Value-First
+        </button>
+      </div>
+
+      <!-- Tab 0: First-Responder Test Queue (Simultaneous Broadcast for Clinic) -->
+      <div id="clinicTabTestQueue" class="clinic-tab-panel" style="display: block;">
+        <div class="role-card">
+          <div class="role-card-header">
+            <div>
+              <h3>⚡ Hàng Đợi Ca Test Sàng Lọc Phát Sóng Đồng Thời (Broadcast Queue)</h3>
+              <p>Mọi ca test từ phụ huynh được gửi đồng thời đến tất cả cơ sở can thiệp. Cơ sở nào tiếp nhận và phản hồi
+                sớm nhất sẽ được ưu tiên ghim lên đầu cho phụ huynh đặt lịch hẹn!</p>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-light" onclick="window.refreshClinicalTestQueues?.()">
+              🔄 Làm Mới Hàng Đợi
+            </button>
+          </div>
+          <div id="clinicTestQueueContainer"
+            style="display: flex; flex-direction: column; gap: 12px; margin-top: 14px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 1: Bookings Pipeline -->
+      <div id="clinicTabBookings" class="clinic-tab-panel">
+        <div class="role-card" id="clinicBookingsSection">
+          <div class="role-card-header">
+            <div>
+              <h3>Danh Sách Lịch Hẹn Can Thiệp 1-1 Chờ Tiếp Nhận</h3>
+              <p>Phụ huynh trải nghiệm bài tập thử 3-5m tại nhà và đăng ký chuyển đổi sang khám trực tiếp tại trung tâm
+              </p>
+            </div>
+            <div class="role-filter-row">
+              <select id="clinicBookingStatusFilter" class="role-select">
+                <option value="all">Tất cả trạng thái</option>
+                <option value="pending">Chờ tiếp nhận (Pending)</option>
+                <option value="contacted">Đã gọi điện tư vấn</option>
+                <option value="confirmed">Đã xác nhận hẹn ngày khám</option>
+                <option value="completed">Đã hoàn thành khám</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="role-table-wrap">
+            <table class="role-table">
+              <thead>
+                <tr>
+                  <th>Phụ Huynh &amp; Số Điện Thoại</th>
+                  <th>Thông Tin Bé &amp; Nhu Cầu</th>
+                  <th>Thời Gian Gửi</th>
+                  <th>Trạng Thái</th>
+                  <th>Cập Nhật Trạng Thái</th>
+                  <th style="text-align: right;">Điều Phối Chuyên Viên</th>
+                </tr>
+              </thead>
+              <tbody id="clinicBookingsTableBody">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Enrolled Students -->
+      <div id="clinicTabStudents" class="clinic-tab-panel" style="display: none;">
+        <div class="role-card" id="clinicStudentsSection">
+          <div class="role-card-header">
+            <div>
+              <h3>Danh Sách Trẻ Đang Can Thiệp Tại Trung Tâm Ánh Sao</h3>
+              <p>Quản lý hồ sơ học viên, giáo viên can thiệp trực tiếp và gói dịch vụ can thiệp</p>
+            </div>
+            <button type="button" class="btn btn-primary" id="btnOpenAddStudentModal"
+              style="background: #0284c7; font-size: 0.82rem; padding: 8px 16px;">
+              ➕ Thêm Học Viên
+            </button>
+          </div>
+
+          <div class="role-table-wrap">
+            <table class="role-table">
+              <thead>
+                <tr>
+                  <th>Học Viên / Bé</th>
+                  <th>Phụ Huynh</th>
+                  <th>Gói Can Thiệp</th>
+                  <th>Chuyên Viên Phụ Trách</th>
+                  <th>Đánh Giá Tiến Độ</th>
+                  <th style="text-align: right;">Hồ Sơ</th>
+                </tr>
+              </thead>
+              <tbody id="clinicStudentsTableBody">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Clinic Facility Profile Form -->
+      <div id="clinicTabProfile" class="clinic-tab-panel" style="display: none;">
+        <div class="role-card" id="clinicProfileSection">
+          <div class="role-card-header">
+            <div>
+              <h3>Cấu Hình Hồ Sơ Phòng Khám &amp; Cơ Sở Can Thiệp</h3>
+              <p>Thông tin này được hiển thị công khai trên Bản đồ &amp; Danh bạ cơ sở uy tín tại Q. Ninh Kiều cho phụ
+                huynh tìm kiếm</p>
+            </div>
+          </div>
+
+          <form id="formClinicProfile">
+            <div
+              style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 16px;">
+              <div class="form-group" style="margin: 0;">
+                <label class="form-label" style="font-size: 0.82rem;">Tên Cơ Sở Can Thiệp *</label>
+                <input type="text" class="form-control" value="Trung tâm Can thiệp Sớm Ánh Sao Ninh Kiều" required>
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label class="form-label" style="font-size: 0.82rem;">Hotline Tiếp Nhận Khẩn Cấp *</label>
+                <input type="text" class="form-control" value="0912 888 999" required>
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 16px;">
+              <label class="form-label" style="font-size: 0.82rem;">Địa Chỉ Cơ Sở Tại Ninh Kiều, Cần Thơ *</label>
+              <input type="text" class="form-control"
+                value="Đường Nguyễn Văn Cừ nối dài, P. An Bình, Q. Ninh Kiều, TP. Cần Thơ" required>
+            </div>
+
+            <div
+              style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 16px;">
+              <div class="form-group" style="margin: 0;">
+                <label class="form-label" style="font-size: 0.82rem;">Giờ Làm Việc Đón Trẻ</label>
+                <input type="text" class="form-control" value="Thứ 2 - Thứ 7 (07:30 - 17:30)">
+              </div>
+              <div class="form-group" style="margin: 0;">
+                <label class="form-label" style="font-size: 0.82rem;">Bác Sĩ / Chuyên Gia Phụ Trách</label>
+                <input type="text" class="form-control" value="ThS. Nguyễn Mai Anh (Giáo dục đặc biệt)">
+              </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 20px;">
+              <label class="form-label" style="font-size: 0.82rem;">Chuyên Môn Thế Mạnh Của Trung Tâm</label>
+              <input type="text" class="form-control"
+                value="Can thiệp sớm tự kỷ (ASD), Trị liệu ngôn ngữ &amp; chậm nói, Điều hòa cảm giác SI, Can thiệp hành vi ABA">
+            </div>
+
+            <div style="display: flex; justify-content: flex-end;">
+              <button type="submit" class="btn btn-primary" style="background: #0284c7; padding: 10px 24px;">
+                Lưu Thay Đổi Hồ Sơ Cơ Sở
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Tab 4: Funnel Analytics -->
+      <div id="clinicTabAnalytics" class="clinic-tab-panel" style="display: none;">
+        <div class="role-card" id="clinicAnalyticsSection">
+          <div class="role-card-header">
+            <div>
+              <h3>Báo Cáo Hiệu Quả Phễu Trao Giá Trị Trước (Value-First Funnel)</h3>
+              <p>Số liệu chuyển đổi thực tế từ trợ lý AI tham vấn đến đăng ký can thiệp trực tiếp 1-1</p>
+            </div>
+            <span class="role-badge-pill center">ROI Tăng 4.2x</span>
+          </div>
+
+          <div
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 24px;">
+            <div
+              style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center;">
+              <span style="font-size: 0.76rem; color: #64748b; font-weight: 700;">BƯỚC 1: TIẾP CẬN AI</span>
+              <h3 style="font-size: 1.6rem; color: #2563eb; margin: 6px 0;">1,250 Lượt</h3>
+              <p style="font-size: 0.75rem; color: #94a3b8; margin: 0;">Phụ huynh tâm sự triệu chứng với AI</p>
+            </div>
+
+            <div
+              style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center;">
+              <span style="font-size: 0.76rem; color: #64748b; font-weight: 700;">BƯỚC 2: TẬP THỬ TẠI NHÀ</span>
+              <h3 style="font-size: 1.6rem; color: #059669; margin: 6px 0;">480 Lượt</h3>
+              <p style="font-size: 0.75rem; color: #94a3b8; margin: 0;">Xem video 3-5m bài tập chuẩn</p>
+            </div>
+
+            <div
+              style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center;">
+              <span style="font-size: 0.76rem; color: #64748b; font-weight: 700;">BƯỚC 3: ĐẶT LỊCH HẸN 1-1</span>
+              <h3 style="font-size: 1.6rem; color: #d97706; margin: 6px 0;">68 Đơn</h3>
+              <p style="font-size: 0.75rem; color: #94a3b8; margin: 0;">Chuyển đổi đăng ký đến trung tâm</p>
+            </div>
+
+            <div
+              style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; text-align: center;">
+              <span style="font-size: 0.76rem; color: #64748b; font-weight: 700;">BƯỚC 4: NHẬP HỌC CAN THIỆP</span>
+              <h3 style="font-size: 1.6rem; color: #7c3aed; margin: 6px 0;">24 Trẻ</h3>
+              <p style="font-size: 0.75rem; color: #94a3b8; margin: 0;">Gia đình tin tưởng ký hợp đồng</p>
+            </div>
+          </div>
+
+          <div
+            style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 16px; font-size: 0.84rem; color: #1e40af; line-height: 1.6;">
+            💡 <strong>Nhận định kinh tế đề án EXE101:</strong> Nhờ mô hình trao giá trị bài tập thực hành trước
+            (Value-First), phụ huynh giảm 85% tâm lý nghi ngờ chất lượng dịch vụ. Chi phí thu hút 1 học viên mới (CAC)
+            giảm từ 1.800.000 VNĐ (chạy ads thông thường) xuống còn <strong>450.000 VNĐ</strong> thông qua nền tảng
+            EduTrace AI.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       CONTAINER 4: ADMIN MASTER WORKSPACE
+       Giao diện điều hành hệ thống dành cho Ban Quản trị
+       ========================================================================== -->
+  <div id="adminRoleWorkspace" class="role-workspace" style="display: none;">
+    <div class="container">
+      <!-- Admin Master Header -->
+      <div class="role-workspace-header" id="adminOverviewSection">
+        <div class="role-profile-meta">
+          <div class="role-profile-avatar admin">🛡️</div>
+          <div class="role-profile-text">
+            <h2>
+              Ban Quản Trị Hệ Thống EduTrace AI
+              <span class="role-badge-pill admin" style="font-size: 0.72rem;">ADMIN PORTAL</span>
+            </h2>
+            <p>Toàn quyền quản lý tài khoản người dùng, giám sát lịch hẹn toàn sàn, cấu hình động cơ AI Gemini</p>
+            <div class="role-profile-tags">
+              <span class="role-mini-tag"><span class="role-status-dot"></span> Hệ thống đang vận hành an toàn</span>
+              <span class="role-mini-tag">🔒 Kiểm duyệt 2 lớp bảo vệ trẻ em</span>
+              <span class="role-mini-tag">⚡ Firebase Auth &amp; Firestore Connected</span>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <a href="admin.html" class="btn btn-primary"
+            style="background: #e11d48; padding: 10px 18px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="9" y1="3" x2="9" y2="21"></line>
+            </svg>
+            <span>Mở Cổng Quản Trị Chuyên Sâu (admin.html) ↗</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Admin Stats Grid -->
+      <div class="role-stats-grid">
+        <div class="role-stat-card">
+          <div class="role-stat-info">
+            <span>Tổng Người Dùng</span>
+            <h3 style="color: #2563eb;">6 Tài Khoản</h3>
+            <p>Phụ huynh, Bác sĩ, Phòng khám, Admin</p>
+          </div>
+          <div class="role-stat-icon blue">👥</div>
+        </div>
+
+        <div class="role-stat-card">
+          <div class="role-stat-info">
+            <span>Toàn Bộ Lịch Hẹn Toàn Sàn</span>
+            <h3 style="color: #059669;">8 Yêu Cầu</h3>
+            <p>Lịch đặt hẹn can thiệp &amp; tư vấn</p>
+          </div>
+          <div class="role-stat-icon emerald">📅</div>
+        </div>
+
+        <div class="role-stat-card">
+          <div class="role-stat-info">
+            <span>Kho Tri Thức AI &amp; Video</span>
+            <h3 style="color: #d97706;">5 Modules / 10 Video</h3>
+            <p>Đã kiểm duyệt lâm sàng 2 lớp</p>
+          </div>
+          <div class="role-stat-icon amber">🧠</div>
+        </div>
+
+        <div class="role-stat-card">
+          <div class="role-stat-info">
+            <span>Bảo Mật Dữ Liệu Trẻ Em</span>
+            <h3 style="color: #e11d48;">100% Tuân Thủ</h3>
+            <p>Mã hóa dữ liệu &amp; ẩn danh bệnh nhi</p>
+          </div>
+          <div class="role-stat-icon rose">🛡️</div>
+        </div>
+      </div>
+
+      <!-- Admin Tabs Bar -->
+      <div class="role-tabs-bar" id="adminTabsBar">
+        <button type="button" class="role-tab-btn active admin" data-tab="adminTabUsers">
+          👥 Quản Lý Người Dùng &amp; Phân Quyền
+        </button>
+        <button type="button" class="role-tab-btn admin" data-tab="adminTabBookings">
+          📅 Quản Lý Toàn Bộ Lịch Hẹn Hệ Thống
+        </button>
+        <button type="button" class="role-tab-btn admin" data-tab="adminTabSystem">
+          ⚙️ Cấu Hình Động Cơ AI &amp; Hệ Thống
+        </button>
+      </div>
+
+      <!-- Tab 1: Users -->
+      <div id="adminTabUsers" class="admin-embedded-panel">
+        <div class="role-card" id="adminUsersSection">
+          <div class="role-card-header">
+            <div>
+              <h3>Danh Sách Người Dùng &amp; Phân Quyền Vai Trò</h3>
+              <p>Quản lý quyền hạn cho Phụ huynh, Bác sĩ và Cơ sở phòng khám đối tác</p>
+            </div>
+            <div class="role-filter-row">
+              <div class="role-search-box">
+                <input type="text" id="adminEmbeddedUserSearch" placeholder="Tìm theo tên, email...">
+              </div>
+              <select id="adminEmbeddedRoleFilter" class="role-select">
+                <option value="all">Tất cả vai trò</option>
+                <option value="parent">Phụ huynh</option>
+                <option value="doctor">Bác sĩ / Chuyên viên</option>
+                <option value="center">Phòng khám / Trung tâm</option>
+                <option value="admin">Quản trị viên</option>
+              </select>
+            </div>
+          </div>
+          <div class="role-table-wrap">
+            <table class="role-table">
+              <thead>
+                <tr>
+                  <th>Tài Khoản</th>
+                  <th>Vai Trò Phân Quyền</th>
+                  <th>Số Điện Thoại</th>
+                  <th>Trạng Thái</th>
+                  <th style="text-align: right;">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="adminEmbeddedUsersTableBody">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Bookings -->
+      <div id="adminTabBookings" class="admin-embedded-panel" style="display: none;">
+        <div class="role-card" id="adminBookingsSection">
+          <div class="role-card-header">
+            <div>
+              <h3>Toàn Bộ Đơn Đăng Ký Tư Vấn &amp; Đặt Lịch Hẹn Trên Sàn</h3>
+              <p>Tổng hợp từ tất cả các cơ sở phòng khám đối tác tại TP. Cần Thơ</p>
+            </div>
+          </div>
+          <div class="role-table-wrap">
+            <table class="role-table">
+              <thead>
+                <tr>
+                  <th>Người Gửi</th>
+                  <th>Loại Yêu Cầu</th>
+                  <th>Cơ Sở Tiếp Nhận</th>
+                  <th>Trạng Thái</th>
+                  <th style="text-align: right;">Xem Chi Tiết</th>
+                </tr>
+              </thead>
+              <tbody id="adminEmbeddedBookingsTableBody">
+                <!-- Populated via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab 3: System & AI Config -->
+      <div id="adminTabSystem" class="admin-embedded-panel" style="display: none;">
+        <div class="role-card" id="adminSystemSection">
+          <div class="role-card-header">
+            <div>
+              <h3>Tổng Quan Động Cơ AI Google Gemini &amp; Kiến Trúc Đề Án</h3>
+              <p>Mô hình khởi nghiệp kết nối công nghệ AI và Giáo dục đặc biệt - FPT University Cần Thơ</p>
+            </div>
+            <a href="admin.html" class="btn btn-primary"
+              style="background: #2563eb; font-size: 0.8rem; padding: 6px 14px;">
+              Quản Trị Tri Thức AI Chuyên Sâu ↗
+            </a>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px;">
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px;">
+              <strong style="color: #0f172a; display: block; margin-bottom: 6px;">Cơ Sở Tri Thức Lâm Sàng</strong>
+              <p style="font-size: 0.82rem; color: #64748b; margin: 0;">5 Modules nạp sẵn: M-CHAT-R/F, DSM-5, Denver II,
+                ABA, Sensory Integration. Hỗ trợ phụ huynh tham vấn chính xác 24/7.</p>
+            </div>
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px;">
+              <strong style="color: #0f172a; display: block; margin-bottom: 6px;">Kho Video Bài Tập 3-5 Phút</strong>
+              <p style="font-size: 0.82rem; color: #64748b; margin: 0;">10 bài tập mẫu do các Bác sĩ &amp; Giáo viên Cần
+                Thơ biên soạn. Giúp phụ huynh tập thử không cần camera phức tạp.</p>
+            </div>
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px;">
+              <strong style="color: #0f172a; display: block; margin-bottom: 6px;">Bảo Mật Thông Tin Trẻ Em</strong>
+              <p style="font-size: 0.82rem; color: #64748b; margin: 0;">Cơ chế 2 lớp kiểm duyệt: Ẩn danh bệnh nhi trước
+                khi đưa vào prompt AI, lưu trữ phân tán an toàn trên Firestore.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL 1: CHI TIẾT BÀI TẬP & VIDEO PLAYER SIMULATION
+
+  <!-- ==========================================================================
+       INVESTOR WORKSPACE (EXCLUSIVE TO INVESTOR / PARTNER ROLE)
+       ========================================================================== -->
+  <div id="investorRoleWorkspace" class="role-workspace" style="display: none;">
+    <div class="container">
+      <div class="role-workspace-header" id="investorOverviewSection">
+        <div class="role-profile-meta">
+          <div class="role-profile-avatar admin" style="background: #0284c7; color: #fff;">📈</div>
+          <div class="role-profile-text">
+            <h2>Nhà Đầu Tư &amp; Đối Tác Chiến Lược <span class="role-badge-pill center" style="font-size: 0.72rem;">INVESTOR PORTAL</span></h2>
+            <p>Báo cáo chỉ số tăng trưởng người dùng, mạng lưới cơ sở can thiệp và hiệu quả tác động xã hội.</p>
+            <div class="role-profile-tags">
+              <span class="role-mini-tag"><span class="role-status-dot"></span> Báo cáo định kỳ do Quản trị viên công bố</span>
+              <span class="role-mini-tag">📊 Dữ liệu xác thực trực tiếp từ Firestore</span>
+            </div>
+          </div>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+        </div>
+      </div>
+
+      <div class="role-card" style="margin-top: 20px;">
+        <section id="investorReportPanel" class="clinical-panel" aria-labelledby="investorReportTitle">
+          <h3 id="investorReportTitle" style="margin-top: 0; color: #0f172a; font-size: 1.2rem;">Báo Cáo Tăng Trưởng Toàn Hệ Thống</h3>
+          <p id="investorReportStatus" role="status" style="color: #64748b; font-size: 0.88rem;">Đang tải số liệu công bố...</p>
+          <div id="investorReportContent" hidden>
+            <h4 id="investorReportName" style="color: #1e293b; font-size: 1.05rem; margin-bottom: 4px;"></h4>
+            <p id="investorReportPeriod" style="color: #64748b; font-size: 0.85rem; margin-bottom: 12px;"></p>
+            <p id="investorReportSummary" style="font-size: 0.92rem; line-height: 1.6; color: #334155; margin-bottom: 16px;"></p>
+            <div class="role-table-wrap">
+              <table class="role-table">
+                <thead>
+                  <tr>
+                    <th>Chỉ Số Chính</th>
+                    <th style="text-align: right;">Giá Trị Xác Thực</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><strong>Tổng Số Người Dùng &amp; Phụ Huynh</strong></td>
+                    <td id="investorReportUsers" style="text-align: right; font-weight: 800; color: #0284c7; font-size: 1.1rem;">-</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Mạng Lưới Đối Tác &amp; Phòng Khám</strong></td>
+                    <td id="investorReportPartners" style="text-align: right; font-weight: 800; color: #059669; font-size: 1.1rem;">-</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Lượt Yêu Cầu Sàng Lọc &amp; Tư Vấn Đã Xử Lý</strong></td>
+                    <td id="investorReportRequests" style="text-align: right; font-weight: 800; color: #ea580c; font-size: 1.1rem;">-</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <p id="investorReportUpdated" style="font-size: 0.8rem; color: #94a3b8; margin-top: 12px;"></p>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <div class="role-modal-overlay" id="doctorEvalModal">
+    <div class="role-modal-box">
+      <div class="role-modal-header">
+        <div>
+          <h3>🩺 Nhập Đánh Giá Lâm Sàng &amp; Phác Đồ Can Thiệp</h3>
+          <p id="evalModalChildName">Bé Bo (2.5 tuổi)</p>
+          <span style="font-size: 0.78rem; color: #2563eb;" id="evalModalParent">Phụ huynh: Lê Thị Mai (0909 123
+            456)</span>
+        </div>
+        <button type="button" class="role-modal-close"
+          onclick="document.getElementById('doctorEvalModal').classList.remove('active')">&times;</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700;">Mức độ can thiệp theo DSM-5 *</label>
+          <select id="evalSeveritySelect" class="form-control">
+            <option value="Mức 1 (Nhẹ - Cần can thiệp sớm)">Mức 1 (Nhẹ - Cần hỗ trợ can thiệp sớm)</option>
+            <option value="Mức 2 (Đáng kể - Cần hỗ trợ nhiều)">Mức 2 (Đáng kể - Cần hỗ trợ nhiều)</option>
+            <option value="Mức 3 (Rất đáng kể - Cần hỗ trợ liên tục)">Mức 3 (Rất đáng kể - Cần hỗ trợ liên tục)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700;">Mục tiêu can thiệp ưu tiên (Priority
+            Goals) *</label>
+          <textarea id="evalPriorityGoals" class="form-control" rows="3"
+            placeholder="Ví dụ: Bật âm đơn /a/, /ba/; tăng tương tác mắt >3 giây khi giao tiếp..."></textarea>
+        </div>
+
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700;">Ghi chú chẩn đoán lâm sàng &amp;
+            Khuyến nghị y khoa</label>
+          <textarea id="evalDoctorNotes" class="form-control" rows="3"
+            placeholder="Nhận xét của bác sĩ về đáp ứng phản xạ, giác quan và tương tác của trẻ..."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+          <button type="button" class="btn btn-outline-light"
+            onclick="document.getElementById('doctorEvalModal').classList.remove('active')">Hủy</button>
+          <button type="button" class="btn btn-primary" id="btnSaveEvaluation" style="background: #059669;">Lưu Đánh Giá
+            Lâm Sàng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: KÊ ĐƠN BÀI TẬP VỀ NHÀ (DOCTOR EXERCISE PRESCRIPTION)
+       ========================================================================== -->
+  <div class="role-modal-overlay" id="doctorPrescribeModal">
+    <div class="role-modal-box">
+      <div class="role-modal-header">
+        <div>
+          <h3>🎯 Kê Đơn Bài Tập Video 3-5 Phút Về Nhà</h3>
+          <p>Chỉ định bài tập chuẩn cho bé: <strong id="rxModalChildName" style="color: #059669;">Bé Bo (2.5
+              tuổi)</strong></p>
+        </div>
+        <button type="button" class="role-modal-close"
+          onclick="document.getElementById('doctorPrescribeModal').classList.remove('active')">&times;</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px;">
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700;">Chọn bài tập từ kho chuẩn hóa
+            *</label>
+          <select id="rxExerciseSelect" class="form-control">
+            <option value="ex-speech-01">Kỹ thuật Thổi bong bóng xà phòng &amp; Kích thích Bật âm đơn /a/, /ba/ (Chậm
+              nói - 3m45s)</option>
+            <option value="ex-speech-02">Trò chơi Ú òa chiếc khăn biến mất &amp; Tương tác mắt tự nhiên (Tương tác mắt -
+              4m15s)</option>
+            <option value="ex-speech-03">Kỹ thuật Gọi tên &amp; Hướng sự chú ý chia sẻ (Joint Attention) (Giao tiếp -
+              3m30s)</option>
+            <option value="ex-asd-01">Kỹ thuật Tiếp cận Nhẹ nhàng &amp; Chia sẻ đồ chơi yêu thích (Tự kỷ ASD - 4m10s)
+            </option>
+            <option value="ex-asd-02">Giao tiếp chức năng bằng thẻ tranh ảnh PECS Giai đoạn 1 (Trao đổi tranh - 4m50s)
+            </option>
+            <option value="ex-adhd-01">Trò chơi Đèn xanh Đèn đỏ kiểm soát xung động vận động (Tăng động ADHD - 3m50s)
+            </option>
+            <option value="ex-adhd-02">Massage xúc giác bàn chân &amp; Thảm gai điều hòa cảm giác (Cảm giác SI - 4m20s)
+            </option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700;">Tần suất rèn luyện *</label>
+          <select id="rxFrequencySelect" class="form-control">
+            <option value="2 lần/ngày (Mỗi lần 3 - 5 phút)">2 lần/ngày (Mỗi lần 3 - 5 phút) - Khuyên dùng</option>
+            <option value="3 lần/ngày (Mỗi lần 3 phút)">3 lần/ngày (Mỗi lần 3 phút) - Tăng cường</option>
+            <option value="1 lần/ngày (Mỗi lần 5 phút)">1 lần/ngày (Mỗi lần 5 phút) - Bắt đầu làm quen</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700;">Lưu ý y khoa dành cho cha mẹ</label>
+          <textarea id="rxNotes" class="form-control" rows="3"
+            placeholder="Ví dụ: Tập trước bữa ăn 30 phút, tuyệt đối không ép khi bé khóc, khen ngợi ngay lập tức..."></textarea>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+          <button type="button" class="btn btn-outline-light"
+            onclick="document.getElementById('doctorPrescribeModal').classList.remove('active')">Hủy</button>
+          <button type="button" class="btn btn-primary" id="btnConfirmPrescription" style="background: #059669;">Xác
+            Nhận Kê Đơn</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: TIẾP NHẬN HỌC VIÊN PHÒNG KHÁM (CLINIC ADD STUDENT)
+       ========================================================================== -->
+  <div class="role-modal-overlay" id="addStudentModal">
+    <div class="role-modal-box">
+      <div class="role-modal-header">
+        <div>
+          <h3>👶 Tiếp Nhận Học Viên Can Thiệp Mới</h3>
+          <p>Trung tâm Can thiệp Sớm Ánh Sao Ninh Kiều</p>
+        </div>
+        <button type="button" class="role-modal-close"
+          onclick="document.getElementById('addStudentModal').classList.remove('active')">&times;</button>
+      </div>
+
+      <form id="formAddStudent" style="display: flex; flex-direction: column; gap: 14px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="font-size: 0.82rem;">Họ và tên bé *</label>
+            <input type="text" id="stdName" class="form-control" placeholder="Ví dụ: Bé Lê Hoàng Phúc" required>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="font-size: 0.82rem;">Độ tuổi *</label>
+            <input type="text" id="stdAge" class="form-control" placeholder="Ví dụ: 3 tuổi (SN: 2023)" required>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="font-size: 0.82rem;">Phụ huynh liên hệ &amp; Số điện thoại *</label>
+          <input type="text" id="stdParent" class="form-control" placeholder="Ví dụ: Mẹ Thúy Hằng (0939 111 222)"
+            required>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="font-size: 0.82rem;">Gói can thiệp</label>
+            <select id="stdProgram" class="form-control">
+              <option value="Can thiệp cá nhân 1-1 chuyên sâu">Can thiệp cá nhân 1-1 chuyên sâu</option>
+              <option value="Bán trú hòa nhập mầm non">Bán trú hòa nhập mầm non</option>
+              <option value="Trị liệu Âm ngữ phục hồi">Trị liệu Âm ngữ phục hồi</option>
+              <option value="Trị liệu Điều hòa Cảm giác (SI)">Trị liệu Điều hòa Cảm giác (SI)</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="font-size: 0.82rem;">Chuyên viên phụ trách</label>
+            <select id="stdTherapist" class="form-control">
+              <option value="ThS. Nguyễn Mai Anh">ThS. Nguyễn Mai Anh</option>
+              <option value="CN. Hoàng Long">CN. Hoàng Long</option>
+              <option value="ThS. Trần Thu Hà">ThS. Trần Thu Hà</option>
+              <option value="CN. Lê Thanh Trúc">CN. Lê Thanh Trúc</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+          <button type="button" class="btn btn-outline-light"
+            onclick="document.getElementById('addStudentModal').classList.remove('active')">Hủy</button>
+          <button type="submit" class="btn btn-primary" style="background: #0284c7;">Tiếp Nhận Học Viên</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: BÀI TEST SÀNG LỌC CHUẨN Y KHOA ĐA NHÁNH (PARENTS SCREENER MODAL)
+       ========================================================================== -->
+  <div class="role-modal-overlay" id="clinicalAssessmentModal">
+    <div class="role-modal-box clinical-test-modal-box">
+      <div class="role-modal-header">
+        <div>
+          <span class="role-badge-pill" id="testModalBadge"
+            style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6; margin-bottom: 6px;">📋 Bài Test Sàng Lọc Chuẩn
+            Y Khoa</span>
+          <h3 id="testModalTitle">Lượng Giá Sàng Lọc Phổ Tự Kỷ (M-CHAT-R/F, CARS &amp; DSM-5)</h3>
+          <p id="testModalSubtitle">Dựa trên tài liệu y khoa chuẩn hóa • Đánh giá nguy cơ &amp; phát sóng đến chuyên gia
+          </p>
+        </div>
+        <button type="button" class="role-modal-close" id="btnCloseClinicalTestModal">&times;</button>
+      </div>
+
+      <!-- VIEW 1: LÀM BÀI TEST -->
+      <div id="clinicalTestFormView">
+        <!-- Patient Info Input Row -->
+        <div class="test-patient-info-grid">
+          <div class="test-patient-field">
+            <label>Họ và tên của bé *</label>
+            <input type="text" id="testChildName" placeholder="Ví dụ: Bé Bo (Lê Gia Bảo)" value="Bé Bo">
+          </div>
+          <div class="test-patient-field">
+            <label>Tháng tuổi của bé *</label>
+            <input type="text" id="testChildAge" placeholder="Ví dụ: 28 tháng" value="28 tháng">
+          </div>
+          <div class="test-patient-field">
+            <label>Họ tên cha / mẹ *</label>
+            <input type="text" id="testParentName" placeholder="Ví dụ: Chị Lan" value="Chị Lan">
+          </div>
+          <div class="test-patient-field">
+            <label>Số điện thoại nhận phản hồi bác sĩ *</label>
+            <input type="tel" id="testParentPhone" placeholder="Ví dụ: 0912 345 678" value="0912 345 678">
+          </div>
+        </div>
+
+        <!-- Questions List Container -->
+        <div class="test-questions-container" id="testQuestionsContainer">
+          <!-- Populated by JS based on branch -->
+        </div>
+
+        <!-- Live Score & Risk Status Bar -->
+        <div class="test-live-score-bar">
+          <div class="test-score-stat">
+            <span>Điểm nguy cơ: </span>
+            <strong id="testLiveScoreText">0/10</strong>
+          </div>
+          <div id="testRiskBadgeEl" class="test-risk-badge low">Nguy cơ thấp</div>
+          <div id="testScaleStandardNote" style="font-size: 0.74rem; color: #94a3b8; max-width: 320px;">
+            Được tính theo trọng số tài liệu y khoa chính thức.
+          </div>
+        </div>
+
+        <!-- Mandatory Disclaimer -->
+        <div class="ai-mandatory-disclaimer-badge">
+          ⚠️ chat box Ai chỉ là công cụ hỗ trợ và có thể mắc sai sót
+        </div>
+
+        <button type="button" class="btn-submit-clinical-test" id="btnSubmitClinicalTest">
+          <span>📤 Gửi Kết Quả Cho Bác Sĩ &amp; Phòng Khám Tiếp Nhận Ngay</span>
+        </button>
+      </div>
+
+      <!-- VIEW 2: KẾT QUẢ SÀNG LỌC & ĐIỀU HƯỚNG BÁC SĨ PHẢN HỒI SỚM NHẤT -->
+      <div id="clinicalTestResultView" style="display: none;">
+        <div id="testResultSummaryBox"
+          style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; margin-bottom: 16px;">
+          <!-- Result summary -->
+        </div>
+
+        <!-- FIRST-RESPONDER PINNED CARD (#1 TOP PRIORITY) -->
+        <div id="firstResponderPinnedContainer">
+          <!-- Rendered by JS: either waiting notice or pinned doctor's clinic -->
+        </div>
+
+        <!-- NEIGHBORING PARTNER CLINICS SECTION (STRICTLY FROM localStorage edutrace_partners_v1) -->
+        <div class="neighboring-clinics-section" id="neighboringClinicsContainer">
+          <!-- Rendered by JS: real partner clinics or 'Chưa có phòng khám lân cận nào được nạp vào hệ thống' -->
+        </div>
+
+        <!-- Mandatory Disclaimer -->
+        <div class="ai-mandatory-disclaimer-badge">
+          ⚠️ chat box Ai chỉ là công cụ hỗ trợ và có thể mắc sai sót
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 14px;">
+          <button type="button" class="btn btn-outline-light" id="btnRetakeTest">Làm Lại Bài Test</button>
+          <button type="button" class="btn btn-primary" id="btnDoneTestView" style="background: #2563eb;">Hoàn
+            Tất</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================================================
+       MODAL: BÁC SĨ / PHÒNG KHÁM TIẾP NHẬN & PHẢN HỒI CA TEST (FIRST RESPONDER)
+       ========================================================================== -->
+  <div class="role-modal-overlay" id="doctorRespondCaseModal">
+    <div class="role-modal-box" style="max-width: 680px;">
+      <div class="role-modal-header">
+        <div>
+          <span class="role-badge-pill doctor" style="margin-bottom: 6px;">⚡ Tiếp Nhận Nhanh (First-Responder)</span>
+          <h3 id="respondModalCaseTitle">Phản Hồi &amp; Tiếp Nhận Ca Sàng Lọc</h3>
+          <p>Phản hồi của bạn sẽ xuất hiện đầu tiên (Pinned #1) và điều hướng bệnh nhân trực tiếp về phòng khám của bạn!
+          </p>
+        </div>
+        <button type="button" class="role-modal-close" id="btnCloseRespondModal">&times;</button>
+      </div>
+
+      <div
+        style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <strong id="respondChildNameText" style="color: #0f172a; font-size: 0.95rem;">Bé Bo (28 tháng)</strong>
+          <span id="respondRiskBadgeText" class="test-risk-badge high">Nguy cơ Cao</span>
+        </div>
+        <div style="font-size: 0.8rem; color: #64748b;" id="respondCaseMetaText">
+          Phụ huynh: Chị Lan (0912 345 678) • Nhánh: Rối loạn phổ Tự kỷ (M-CHAT &amp; CARS)
+        </div>
+      </div>
+
+      <form id="formDoctorRespond" style="display: flex; flex-direction: column; gap: 12px;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="font-size: 0.82rem; font-weight: 700;">Bác sĩ / Chuyên viên tiếp nhận
+              *</label>
+            <input type="text" id="respondDoctorName" class="form-control" required>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="font-size: 0.82rem; font-weight: 700;">Cơ sở / Phòng khám phụ trách
+              *</label>
+            <input type="text" id="respondClinicName" class="form-control" required>
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 12px;">
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="font-size: 0.82rem; font-weight: 700;">Địa chỉ phòng khám đón tiếp bệnh
+              nhân *</label>
+            <input type="text" id="respondClinicAddress" class="form-control" required>
+          </div>
+          <div class="form-group" style="margin: 0;">
+            <label class="form-label" style="font-size: 0.82rem; font-weight: 700;">Số Hotline / Điện thoại *</label>
+            <input type="tel" id="respondClinicPhone" class="form-control" required>
+          </div>
+        </div>
+
+        <div class="form-group" style="margin: 0;">
+          <label class="form-label" style="font-size: 0.82rem; font-weight: 700;">Lời nhận xét chuyên môn &amp; Lời mời
+            hẹn khám gửi phụ huynh *</label>
+          <textarea id="respondDoctorFeedback" class="form-control" rows="4"
+            placeholder="Nhập nhận định lâm sàng dựa trên điểm test, hướng dẫn xử trí ban đầu và đề xuất lịch lượng giá trực tiếp..."
+            required></textarea>
+        </div>
+
+        <div class="ai-mandatory-disclaimer-badge">
+          ⚠️ chat box Ai chỉ là công cụ hỗ trợ và có thể mắc sai sót
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 8px;">
+          <button type="button" class="btn btn-outline-light" id="btnCancelRespond">Đóng</button>
+          <button type="submit" class="btn btn-primary"
+            style="background: #ea580c; border-color: #ea580c; font-weight: 800;">
+            🚀 Xác Nhận Tiếp Nhận &amp; Gửi Phản Hồi Ngay
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Specialized Clinical Knowledge Base & Google Gemini AI Service -->
+  <script src="js/gemini-knowledge.js"></script>
+  <script src="js/gemini-service.js"></script>
   <script type="module" src="js/workspace-page.js"></script>
 </body>
 </html>
